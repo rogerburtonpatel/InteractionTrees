@@ -787,6 +787,7 @@ induction H; intros t1' t2' Heqot1 Heqot2; try easy; subst.
     + taur. now apply IHeqitF. 
 Qed. 
 
+
 Lemma eqit_inv_Tau {E R1 R2 RR} b1 b2 t1 t2 :
   @eqit E R1 R2 RR b1 b2 (Tau t1) (Tau t2) -> eqit RR b1 b2 t1 t2.
 Proof with eauto with itree.
@@ -2117,6 +2118,8 @@ repeat match goal with
 | [|- inf_closed _] => (inf_closed_forall_auto || inf_closed_impl_auto)
 end. 
 
+Ltac taus := apply EqTau. 
+
 Ltac tower_induction := apply tower; [inf_closed_auto|].
 Tactic Notation "tower" "induction" := tower_induction. 
 
@@ -2191,7 +2194,7 @@ btt gfp            btt gfp
   ↓                   ↓
   τ m1 ← ?btt elem →  x1
 *)
-
+  
     genobs y0 oy0. 
   (* need something more: t3 is either a τ node, or it isn't. *)
     assert (DEC: (exists m3, oy0 = TauF m3) \/ (forall m3, oy0 <> TauF m3)).
@@ -2199,22 +2202,20 @@ btt gfp            btt gfp
     destruct DEC as [EQ | EQ].
     (* τ - τ case: strip both. *)
     + destruct EQ as [m3 ?]; subst; simpobs.
-      inv H1'; try easy.  
-      * constructor.
-        backstep in REL. 
-        eapply H; eauto.
-         (* really tricky: we want our 
-         inductive conclusions be b (elem) but
-         we want our goal to stay as elem *)
-        remember (TauF m2).
-        remember (TauF m3).
-        (* consider messing with elem before induction *)
-        hinduction H2 before H; intros; inv Heqi0; try inv Heqi; try easy. 
-        (* probably true but hard to prove *)
-        -- shelve. 
-        -- shelve. 
-        (* same here, but probably looks similar to above *)
+    (* this needs a fix, or we need to go a layer deeper *)
+      dependent induction H2; intros; simpobs.
+      * remember (TauF m3). 
+      induction H1'; try inv Heqi1; inv Heqi; try inv Heqi0; try easy. 
+      -- taus.  
+         backstep in REL. 
+         eapply H; eauto. 
+      -- taur. now apply IHH1'. 
+      * clear IHeqitF. 
+      (* bad IH, fix 2205 seems doable *)
+      shelve. 
+      (* bad IH, fix 2205 seems doable *)
       * shelve. 
+
     (* τ - ̸τ : we do further case analysis. *)
     + inv H1'; try (exfalso; eapply EQ; eauto; fail).
       * taul. 
