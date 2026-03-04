@@ -2194,7 +2194,8 @@ btt gfp            btt gfp
   ↓                   ↓
   τ m1 ← ?btt elem →  x1
 *)
-  
+
+
     genobs y0 oy0. 
   (* need something more: t3 is either a τ node, or it isn't. *)
     assert (DEC: (exists m3, oy0 = TauF m3) \/ (forall m3, oy0 <> TauF m3)).
@@ -2202,38 +2203,53 @@ btt gfp            btt gfp
     destruct DEC as [EQ | EQ].
     (* τ - τ case: strip both. *)
     + destruct EQ as [m3 ?]; subst; simpobs.
-    (* this needs a fix, or we need to go a layer deeper *)
-      dependent induction H2; intros; simpobs.
-      * remember (TauF m3). 
-      induction H1'; try inv Heqi1; inv Heqi; try inv Heqi0; try easy. 
-      -- taus.  
-         backstep in REL. 
-         eapply H; eauto. 
-      -- taur. now apply IHH1'. 
-      * clear IHeqitF. 
-      (* bad IH, fix 2205 seems doable *)
-      shelve. 
-      (* bad IH, fix 2205 seems doable *)
-      * shelve. 
-
-    (* τ - ̸τ : we do further case analysis. *)
-    + inv H1'; try (exfalso; eapply EQ; eauto; fail).
-      * taul. 
+    remember (TauF m3).
+    (* assert (elem x (Tau m2) (Tau m3)) by now apply (b_chain x). *)
+    induction H1'; try inv Heqi1; try inv Heqi; try inv Heqi0; try easy. 
+    *
+     (* one idea: go a layer deeper *)
       remember (TauF m2).
-      (* pattern: do something with H2, or with REL?
-        going to be same in RET and VIS; we will use congruence.
-      *)
-      shelve. 
-        (* hinduction REL before H; intros; inv Heqi; eauto with itree. *)
-      * taul. remember (TauF m2) as ot.
-      (* need strong general IH but not too strong *)
-        revert H2. intros H2. 
-        (* this is just a fancy inversion *)
-        inv H2; simpobs; try easy.
-        inv H5. 
-        (* again, we're here *)
-        shelve. 
-      * constructor. 
+      (* stepdown in REL0.  *)
+      remember (TauF m3).
+      induction H2; try inv Heqi; try inv Heqi0; try easy. 
+      (* here. *)
+      -- backstep in REL. taus. eapply H; eauto. 
+      -- shelve. 
+      -- shelve. 
+    * taur. now apply IHH1'. 
+    (* τ - ̸τ : we do further case analysis. *)
+    + inv H1'; try solve [exfalso; eapply EQ; eauto].
+      * taul.
+        simpobs. 
+        inv H2.
+        remember (RetF r2).
+        induction REL0; try easy.   
+        -- remember (RetF r1).
+          induction REL; inv Heqi; try inv Heqi0; subst; try easy. 
+          ++ now constructor. 
+          ++ taul. now apply IHREL. 
+        -- apply IHREL0; eauto. 
+           backstep. 
+           apply eqit_inv_Tau_r. 
+           now step. 
+      * taul.
+        simpobs. 
+        inv H2.
+        remember (VisF e k2).
+        induction REL1; try easy. 
+        -- remember (VisF e0 k0).
+          induction REL; subst; try easy. 
+          ++ do 2 inv_Vis. constructor. 
+            intro v. 
+            specialize (REL v).
+            specialize (REL0 v).
+            eapply H; eauto. 
+          ++ taul. now apply IHREL. 
+        -- apply IHREL1; eauto. 
+           backstep. 
+           apply eqit_inv_Tau_r. 
+           now step. 
+      * taus. 
       inv H2; try congruence.
       backstep in REL0. backstep in REL. 
       (* want H here, need to know more about m2 and y0 *)
