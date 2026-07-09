@@ -139,19 +139,19 @@ Tactic Notation "rstep" "in" ident(h) := runfold_in h; step in h; rcbn in h.
 
 #[local] Ltac refold :=
   repeat match goal with
-  | |- context[gfp (@rutt_mon ?E1 ?E2 ?RE ?RA)] =>
-      fold (@rutt E1 E2 RE RA)
+  | |- context[gfp (@rutt_mon ?E1 ?E2 ?RE ?RA) ?R1 ?R2 ?RR] =>
+      fold (@rutt E1 E2 R1 R2 RE RA RR)
   end.
 
 Ltac fold_rutt :=
   match goal with
   | |- context[@ruttF ?E1 ?E2 ?REv ?RAns ?R1 ?R2 ?RR] =>
-      change (@ruttF E1 E2 REv RAns R1 R2 RR) with (body (@rutt_mon E1 E2 REv RAns R1 R2 RR))
+      change (@ruttF E1 E2 REv RAns R1 R2 RR) with (body (@rutt_mon E1 E2 REv RAns) R1 R2 RR)
   end.
 Ltac fold_rutt_in h :=
   match type of h with
   | context[@ruttF ?E1 ?E2 ?REv ?RAns ?R1 ?R2 ?RR] =>
-      change (@ruttF E1 E2 REv RAns R1 R2 RR) with (body (@rutt_mon E1 E2 REv RAns R1 R2 RR)) in h
+      change (@ruttF E1 E2 REv RAns R1 R2 RR) with (body (@rutt_mon E1 E2 REv RAns) R1 R2 RR) in h
   end.
 Tactic Notation "runstep" := fold_rutt; unstep.
 Tactic Notation "runstep" "in" ident(h) := fold_rutt_in h; unstep in h.
@@ -160,10 +160,10 @@ Ltac to_rmon_core :=
 match goal with
 | |- context[@ruttF ?E1 ?E2 ?REv ?RAns ?R1 ?R2 ?RR (?f ?R1 ?R2 ?RR) (observe ?t1) (observe ?t2)] =>
       change (@ruttF E1 E2 REv RAns R1 R2 RR (f R1 R2 RR) (observe t1) (observe t2))
-      with (@rutt_mon E1 E2 REv RAns f R1 R2 RR t1 t2)
+      with (body (@rutt_mon E1 E2 REv RAns) f R1 R2 RR t1 t2)
 | |- context[@ruttF ?E1 ?E2 ?REv ?RAns ?R1 ?R2 ?RR (?f ?R1 ?R2 ?RR) (?con1 ?a1) (?con2 ?a2)] =>
       change (@ruttF E1 E2 REv RAns R1 R2 RR (f R1 R2 RR) (con1 a1) (con2 a2))
-      with (@rutt_mon E1 E2 REv RAns f R1 R2 RR (go (con1 a1)) (go (con2 a2)))
+      with (body (@rutt_mon E1 E2 REv RAns) f R1 R2 RR (go (con1 a1)) (go (con2 a2)))
 end.
 
 Ltac to_rmon :=
@@ -178,10 +178,10 @@ Ltac to_rmon_in h :=
 match type of h with
 | context[@ruttF ?E1 ?E2 ?REv ?RAns ?R1 ?R2 ?RR (?f ?R1 ?R2 ?RR) (observe ?t1) (observe ?t2)] =>
       change (@ruttF E1 E2 REv RAns R1 R2 RR (f R1 R2 RR) (observe t1) (observe t2))
-      with (@rutt_mon E1 E2 REv RAns f R1 R2 RR t1 t2) in h
+      with (body (@rutt_mon E1 E2 REv RAns) f R1 R2 RR t1 t2) in h
 | context[@ruttF ?E1 ?E2 ?REv ?RAns ?R1 ?R2 ?RR (?f ?R1 ?R2 ?RR) (?con1 ?a1) (?con2 ?a2)] =>
       change (@ruttF E1 E2 REv RAns R1 R2 RR (f R1 R2 RR) (con1 a1) (con2 a2))
-      with (@rutt_mon E1 E2 REv RAns f R1 R2 RR (go (con1 a1)) (go (con2 a2))) in h
+      with (body (@rutt_mon E1 E2 REv RAns) f R1 R2 RR (go (con1 a1)) (go (con2 a2))) in h
 end.
 
 Tactic Notation "to_rmon" "in" ident(h) := to_rmon_in h.
@@ -200,7 +200,7 @@ Variable (RR: R1 -> R2 -> Prop).
 
 Lemma rutt_Ret r1 r2:
   RR r1 r2 ->
-  @rutt E1 E2 REv RAns R1 R2 RR (Ret r1: itree E1 R1) (Ret r2: itree E2 R2).
+  @rutt E1 E2 R1 R2 REv RAns RR (Ret r1: itree E1 R1) (Ret r2: itree E2 R2).
 Proof. intros. rstep. constructor; auto. Qed.
 
 Lemma rutt_inv_Ret r1 r2:

@@ -260,7 +260,7 @@ Section PrintMults.
     destruct a.
     prove_arg H0; auto with itree. 
     match type of H0 with
-      gfp _ _ ?tr ?t => assert (Hk1 : tr ⊑ t) by auto end.
+      gfp _ _ _ _ ?tr ?t => assert (Hk1 : tr ⊑ t) by auto end.
     simpobs. constructor; auto.
     intros [].
     clear x tr. 

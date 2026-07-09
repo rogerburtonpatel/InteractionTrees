@@ -140,8 +140,8 @@ Proof.
 Qed.
 
 #[global] Instance eq_proper_ruttC {E1 E2 R1 R2 REv RAns}
-  (RR : R1 -> R2 -> Prop) (c : Chain (@rutt_mon E1 E2 R1 R2 REv RAns)):
-  Proper (eq_itree eq ==> eq_itree eq ==> iff) (elem c RR).
+  (RR : R1 -> R2 -> Prop) (c : Chain (@rutt_mon E1 E2 REv RAns)):
+  Proper (eq_itree eq ==> eq_itree eq ==> iff) (elem c _ _ RR).
 Proof.
   split; revert_until c; tower induction;
   intros IH t1 t1' Ht1 t2 t2' Ht2;
@@ -187,8 +187,8 @@ Proof.
 Qed.
 
 #[global] Instance euttge_proper_ruttC {E1 E2 R1 R2 REv RAns}
-  (RR : R1 -> R2 -> Prop) (c : Chain (@rutt_mon E1 E2 R1 R2 REv RAns)):
-  Proper (euttge eq ==> euttge eq ==> flip impl) (elem c RR).
+  (RR : R1 -> R2 -> Prop) (c : Chain (@rutt_mon E1 E2 REv RAns)):
+  Proper (euttge eq ==> euttge eq ==> flip impl) (elem c _ _ RR).
 Proof.
   unfold Proper, respectful, flip, impl.
   tower induction.
