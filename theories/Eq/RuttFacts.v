@@ -114,15 +114,23 @@ Qed.
 
 (* Progressive [Proper] instances for [rutt] and congruence with eutt. *)
 
-#[global] Instance rutt_Proper_R {E1 E2 R1 R2}:
+(** NOTE: Borrowed from rocq-stdlib version 9.2.
+    This may be removed when the ITree library supports later versions. *)
+Notation "'forallR' x .. y , R" :=
+  (@forall_relation _ _ (fun x => .. (@forall_relation _ _ (fun y => R%signature)) ..))
+  (right associativity, at level 55, x binder, y binder) : signature_scope.
+
+#[global] Instance rutt_Proper_R {E1 E2}:
   Proper (eq_REv         (* REv *)
       ==> eq_RAns        (* RAns *)
-      ==> @eq_rel R1 R2  (* RR *)
+      ==>
+      forallR R1 R2,    (* R1 R2 *)
+      @eq_rel R1 R2  (* RR *)
       ==> eq             (* t1 *)
       ==> eq             (* t2 *)
-      ==> iff) (@rutt E1 E2 R1 R2).
+      ==> iff) (@rutt E1 E2).
 Proof.
-  intros REv1 REv2 HREv  RAns1 RAns2 HRAns RR1 RR2 HRR t1 _ <- t2 _ <-.
+  intros REv1 REv2 HREv RAns1 RAns2 HRAns R1 R2 RR1 RR2 HRR t1 _ <- t2 _ <-.
   split; intros Hrutt; 
     revert t1 t2 Hrutt; coinduction c CIH; intros t1 t2 Hrutt; 
     step in Hrutt; rcbn; 
@@ -138,6 +146,16 @@ Proof.
       { erewrite eq_RAns_iff. apply H1. assumption. }
       intros. specialize (H0 a b H2). now apply CIH.
 Qed.
+
+(** NOTE: Extra instance needed for rewriting to work for itrees [t1 t2]
+    and relation [RR]. *)
+#[global] Instance rutt_Proper_R' {E1 E2 R1 R2}
+ (REv : prerel E1 E2) (RAns : postrel E1 E2) :
+  Proper (@eq_rel R1 R2  (* RR *)
+      ==> eq             (* t1 *)
+      ==> eq             (* t2 *)
+      ==> iff) (@rutt E1 E2 REv RAns R1 R2).
+Proof. now apply rutt_Proper_R. Qed.
 
 #[global] Instance eq_proper_ruttC {E1 E2 R1 R2 REv RAns}
   (RR : R1 -> R2 -> Prop) (c : Chain (@rutt_mon E1 E2 REv RAns)):
@@ -168,23 +186,35 @@ Qed.
 
 #[global] Instance eq_proper_rutt {E1 E2 R1 R2 REv RAns}
   (RR : R1 -> R2 -> Prop):
-  Proper (eq_itree eq ==> eq_itree eq ==> iff) (@rutt E1 E2 R1 R2 REv RAns RR).
+  Proper (eq_itree eq ==> eq_itree eq ==> iff) (@rutt E1 E2 REv RAns R1 R2 RR).
 Proof.
   unfold rutt. intros t1 t1' Ht1 t2 t2' Ht2.
   apply eq_proper_ruttC; auto.
 Qed.
 
-#[global] Instance rutt_Proper_R2 {E1 E2 R1 R2}:
+#[global] Instance rutt_Proper_R2 {E1 E2}:
   Proper (eq_REv         (* REv *)
       ==> eq_RAns        (* RAns *)
-      ==> @eq_rel R1 R2  (* RR *)
+      ==>
+      forallR R1 R2,    (* R1 R2 *)
+      @eq_rel R1 R2  (* RR *)
       ==> eq_itree eq    (* t1 *)
       ==> eq_itree eq    (* t2 *)
-      ==> iff) (@rutt E1 E2 R1 R2).
+      ==> iff) (@rutt E1 E2).
 Proof.
-  intros REv1 REv2 HREv RAns1 RAns2 HRAns RR1 RR2 HRR t1 t1' Ht1 t2 t2' Ht2.
+  intros REv1 REv2 HREv RAns1 RAns2 HRAns R1 R2 RR1 RR2 HRR t1 t1' Ht1 t2 t2' Ht2.
   rewrite Ht1, Ht2. apply rutt_Proper_R; auto.
 Qed.
+
+(** NOTE: Extra instance needed for rewriting to work for itrees [t1 t2]
+    and relation [RR]. *)
+#[global] Instance rutt_Proper_R2' {E1 E2 R1 R2}
+ (REv : prerel E1 E2) (RAns : postrel E1 E2) :
+  Proper (@eq_rel R1 R2  (* RR *)
+      ==> eq_itree eq    (* t1 *)
+      ==> eq_itree eq    (* t2 *)
+      ==> iff) (@rutt E1 E2 REv RAns R1 R2).
+Proof. now apply rutt_Proper_R2. Qed.
 
 #[global] Instance euttge_proper_ruttC {E1 E2 R1 R2 REv RAns}
   (RR : R1 -> R2 -> Prop) (c : Chain (@rutt_mon E1 E2 REv RAns)):
@@ -252,7 +282,7 @@ Qed.
 
 #[global] Instance euttge_proper_rutt {E1 E2 R1 R2 REv RAns}
   (RR : R1 -> R2 -> Prop):
-  Proper (euttge eq ==> euttge eq ==> flip impl) (@rutt E1 E2 R1 R2 REv RAns RR).
+  Proper (euttge eq ==> euttge eq ==> flip impl) (@rutt E1 E2 REv RAns R1 R2 RR).
 Proof.
   unfold rutt. intros t1 t1' Ht1 t2 t2' Ht2.
   apply euttge_proper_ruttC; auto.
@@ -349,16 +379,20 @@ Proof.
     apply EqTauR. eapply IHHrutt; eauto.
 Qed.
 
-#[global] Instance rutt_Proper_R3 {E1 E2 R1 R2}:
+#[global] Instance rutt_Proper_R3 {E1 E2}:
   Proper (eq_REv         (* REv *)
       ==> eq_RAns        (* RAns *)
-      ==> @eq_rel R1 R2  (* RR *)
+      ==>
+      forallR R1 R2,    (* R1 R2 *)
+      @eq_rel R1 R2  (* RR *)
       ==> eutt eq        (* t1 *)
       ==> eutt eq        (* t2 *)
-      ==> iff) (@rutt E1 E2 R1 R2).
+      ==> iff) (@rutt E1 E2).
 Proof.
-  intros REv REv2 HREv RAns RAns2 HRAns RR RR2 HRR t1 t1' Ht1 t2 t2' Ht2.
-  rewrite <- HREv, <- HRAns, <- HRR; clear HREv REv2 HRAns RAns2 HRR RR2.
+  intros REv REv2 HREv RAns RAns2 HRAns R1 R2 RR RR2 HRR t1 t1' Ht1 t2 t2' Ht2.
+  rewrite <- HREv, <- HRAns.
+  transitivity (rutt REv RAns RR t1' t2'); [| now apply rutt_Proper_R].
+  clear HREv REv2 HRAns RAns2 HRR RR2.
   split; intros Hrutt.
   - eapply rutt_cong_eutt; eauto.
     rewrite rutt_flip in *. eapply rutt_cong_eutt; eauto.
@@ -366,6 +400,16 @@ Proof.
     eapply rutt_cong_eutt; eauto.
     rewrite rutt_flip in *. eapply rutt_cong_eutt; eauto.
 Qed.
+
+(** NOTE: Extra instance needed for rewriting to work for itrees [t1 t2]
+    and relation [RR]. *)
+#[global] Instance rutt_Proper_R3' {E1 E2 R1 R2}
+ (REv : prerel E1 E2) (RAns : postrel E1 E2) :
+  Proper (@eq_rel R1 R2  (* RR *)
+      ==> eutt eq    (* t1 *)
+      ==> eutt eq    (* t2 *)
+      ==> iff) (@rutt E1 E2 REv RAns R1 R2).
+Proof. now apply rutt_Proper_R3. Qed.
 
 (* Bind closure and bind lemmas. *)
 
@@ -410,7 +454,7 @@ Qed.
 
 Lemma rutt_bind_b {U1 U2 UU} t1 t2 k1 k2
       (c : Chain (rutt_mon REv RAns))
-      (EQT: @rutt E1 E2 U1 U2 REv RAns UU t1 t2)
+      (EQT: @rutt E1 E2 REv RAns U1 U2 UU t1 t2)
       (EQK: forall u1 u2, UU u1 u2 -> rutt REv RAns RR (k1 u1) (k2 u2)):
   rutt_mon REv RAns (elem c) _ _ RR (ITree.bind t1 k1) (ITree.bind t2 k2).
 Proof.

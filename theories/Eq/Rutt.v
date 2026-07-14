@@ -70,42 +70,30 @@ Section RuttF.
 
   Definition rutt_mon : mon (forall R1 R2, (R1 -> R2 -> Prop) -> itree E1 R1 -> itree E2 R2 -> Prop) :=
     {| body := rutt_ ; Hbody := rutt_mono |}. 
-End RuttF.
 
-(** NOTE: Breaking up section to restore proper argument order for [rutt] itself.
-    For [rutt] the type arguments must be before [REv] and [RAns], but for [ruttF],
-    [rutt_], and [rutt_mon] we universally quantify [R1] and [R2] _under_ the
-    simulation argument [sim] to provide flexibility with [ITree.bind] in
-    coinductive proofs.
-
-    FIXME: How do use [Arguments] command without breaking up section? *)
-Section RuttF.
-  Context {E1 E2 : Type -> Type}.
-  Context {R1 R2 : Type}.
-  Context (REv : forall (A B : Type), E1 A -> E2 B -> Prop ).
-  Context (RAns : forall (A B : Type), E1 A -> A -> E2 B -> B -> Prop ).
-  Implicit Type RR : R1 -> R2 -> Prop.
-
-  Definition rutt : (R1 -> R2 -> Prop) -> itree E1 R1 -> itree E2 R2 -> Prop :=
-    gfp (rutt_mon REv RAns) R1 R2.
+  Definition rutt {R1 R2 : Type} : (R1 -> R2 -> Prop) -> itree E1 R1 -> itree E2 R2 -> Prop :=
+    gfp rutt_mon R1 R2.
   Hint Unfold rutt : itree.
 
+  Context {R1 R2 : Type}.
+  Implicit Types RR : R1 -> R2 -> Prop.
+
   Lemma ruttF_inv_VisF_r {sim} RR t1 U2 (e2: E2 U2) (k2: U2 -> _):
-    ruttF REv RAns RR sim t1 (VisF e2 k2) ->
+    ruttF RR sim t1 (VisF e2 k2) ->
     (exists U1 (e1: E1 U1) k1, t1 = VisF e1 k1 /\
-      forall v1 v2, RAns _ _ e1 v1 e2 v2 -> sim (k1 v1) (k2 v2))
+      forall v1 v2, RAns e1 v1 e2 v2 -> sim (k1 v1) (k2 v2))
     \/
     (exists t1', t1 = TauF t1' /\
-      ruttF REv RAns RR sim (observe t1') (VisF e2 k2)).
+      ruttF RR sim (observe t1') (VisF e2 k2)).
   Proof.
     refine (fun H =>
-      match H in ruttF _ _ _ _ _ t2 return
+      match H in ruttF _ _ _ t2 return
         match t2 return Prop with
         | VisF e2 k2 => _
         | _ => True
         end
       with
-      | EqVis _ _ _ _ _ _ _ _ _ _ _ _ => _
+      | EqVis _ _ _ _ _ _ _ _ _ _ => _
       | _ => _
       end); try exact I.
     - left; eauto.
@@ -114,8 +102,8 @@ Section RuttF.
 
   Lemma ruttF_inv_VisF {sim}
       RR U1 U2 (e1 : E1 U1) (e2 : E2 U2) (k1 : U1 -> _) (k2 : U2 -> _)
-    : ruttF REv RAns RR sim (VisF e1 k1) (VisF e2 k2) ->
-      forall v1 v2, RAns _ _ e1 v1 e2 v2 -> sim (k1 v1) (k2 v2).
+    : ruttF RR sim (VisF e1 k1) (VisF e2 k2) ->
+      forall v1 v2, RAns e1 v1 e2 v2 -> sim (k1 v1) (k2 v2).
   Proof.
     intros H. dependent destruction H. assumption.
   Qed.
@@ -140,7 +128,7 @@ Tactic Notation "rstep" "in" ident(h) := runfold_in h; step in h; rcbn in h.
 #[local] Ltac refold :=
   repeat match goal with
   | |- context[gfp (@rutt_mon ?E1 ?E2 ?RE ?RA) ?R1 ?R2 ?RR] =>
-      fold (@rutt E1 E2 R1 R2 RE RA RR)
+      fold (@rutt E1 E2 RE RA R1 R2 RR)
   end.
 
 Ltac fold_rutt :=
@@ -200,7 +188,7 @@ Variable (RR: R1 -> R2 -> Prop).
 
 Lemma rutt_Ret r1 r2:
   RR r1 r2 ->
-  @rutt E1 E2 R1 R2 REv RAns RR (Ret r1: itree E1 R1) (Ret r2: itree E2 R2).
+  @rutt E1 E2 REv RAns R1 R2 RR (Ret r1: itree E1 R1) (Ret r2: itree E2 R2).
 Proof. intros. rstep. constructor; auto. Qed.
 
 Lemma rutt_inv_Ret r1 r2:
