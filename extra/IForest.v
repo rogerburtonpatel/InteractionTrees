@@ -426,9 +426,9 @@ Proof.
     repeat red; repeat red in HI. 
     step in H0.   
     inv HI; simpobs.
-    + inv H0. eapply Interp_iforest_Ret; eauto. 
-    + inv H0. econstructor. symmetry in REL. eapply H; eauto. 
-    + eapply eqitF_inv_VisF_l in H0. crunch; try easy. 
+    + inv H0; try discriminate. eapply Interp_iforest_Ret; eauto. 
+    + inv H0; try discriminate. econstructor. symmetry in REL. eapply H; eauto. 
+    + eapply eqitF_inv_VisF_l in H0. crunch; try discriminate. 
       simpobs. econstructor; eauto. intros. 
       symmetry in H1. eapply H. 
       apply H1. all: eauto.
@@ -436,9 +436,9 @@ Proof.
     repeat red; repeat red in HI.
     step in H0.   
     inv HI; simpobs.   
-    + inv H0. eapply Interp_iforest_Ret; eauto. 
-    + inv H0. econstructor. eapply H; eauto. 
-    + eapply eqitF_inv_VisF_r in H0. crunch; try easy. 
+    + inv H0; try discriminate. eapply Interp_iforest_Ret; eauto. 
+    + inv H0; try discriminate. econstructor. eapply H; eauto. 
+    + eapply eqitF_inv_VisF_r in H0. crunch; try discriminate. 
       simpobs. econstructor; eauto. intros. 
       eapply H.  
       apply H1. all: eauto.
@@ -452,7 +452,7 @@ Lemma interp_iforest_correct_exec:
 Proof.
   intros.
   revert t t' H1.
-  coinduction.
+  icoinduction c CIH; to_mon.
   intros t t' eq.
   unfold interp, Basics.iter, MonadIter_itree.
   rewrite (itree_eta t) in eq.
@@ -554,7 +554,7 @@ Proof.
       { rewrite <- (Eqit.bind_ret_r ta).
         apply eutt_bind_eutt with (UU := fun u1 u2 => u1 = u2 /\ Leaf u1 ta).
         rewrite Eqit.bind_ret_r. apply eutt_Leaf.
-        intros. destruct H0. subst. specialize (HK u2 H1). step in HK. inv HK.
+        intros. destruct H0. subst. specialize (HK u2 H1). step in HK. now inv HK. 
       }
       rewrite H0 in H.
       specialize (HP R e e eq_refl). unfold Eq1_iforest in HP. destruct HP as (P & _ & _).
@@ -607,7 +607,7 @@ Proof.
     + rewrite <- H.
       step. now econstructor. 
     + rewrite H.
-      step in H0. inv H0.
+      step in H0. now inv H0.
   - typeclasses eauto.
   - typeclasses eauto.
 Qed.
@@ -649,7 +649,7 @@ Lemma interp_iforest_tau_inv :
     interp_iforest h_spec R RR s t.
 Proof.
   intros.
-  sinv H. 
+  now sinv H. 
 Qed.
 
 Lemma case_iforest_handler_correct:

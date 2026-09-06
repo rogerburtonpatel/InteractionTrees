@@ -13,9 +13,9 @@ Set Warnings "-future-coercion-class-field".
    https://coq.inria.fr/stdlib/Coq.Relations.Relation_Definitions.html. *)
 (* A categorical account of this file is given in [CategoryRelation.v] *)
 
-#[global] Tactic Notation "intros !" := repeat intro.
-
 Definition relationH (A B : Type) := A -> B -> Prop.
+
+#[global] Tactic Notation "intros !" := repeat intro.
 
 Section RelationH_Operations.
 

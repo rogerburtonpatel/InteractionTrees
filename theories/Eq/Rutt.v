@@ -191,7 +191,7 @@ Proof. intros. rstep. constructor; auto. Qed.
 Lemma rutt_inv_Ret r1 r2:
   rutt REv RAns RR (Ret r1) (Ret r2) -> RR r1 r2.
 Proof.
-  intros. rstep in H. inv H.
+  intros. rstep in H. inv H. assumption. 
 Qed.
 
 Lemma rutt_inv_Ret_l r1 t2:
@@ -224,7 +224,7 @@ Proof.
   intros H. remember (TauF t1) as tt1.
   induction H; try discriminate.
   - inv Heqtt1. constructor. rstep in H. exact H.
-  - inv Heqtt1.
+  - inv Heqtt1. assumption. 
   - constructor. auto.
 Qed.
 
@@ -237,7 +237,7 @@ Proof.
   induction H; try discriminate.
   - inv Heqtt2. constructor. rstep in H. exact H.
   - constructor. auto.
-  - inv Heqtt2.
+  - inv Heqtt2. assumption. 
 Qed.
 
 Lemma rutt_inv_Tau_l t1 t2 :

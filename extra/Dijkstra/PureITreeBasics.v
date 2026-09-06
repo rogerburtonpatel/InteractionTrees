@@ -95,11 +95,12 @@ Qed.
 Lemma eutt_ret_euttge : forall (E : Type -> Type) (A : Type) (a : A) (t : itree E A),
       t ≈ Ret a -> t ≳ Ret a.
 Proof.
-  intros. generalize dependent t. icoinduction c CIH. intros. sinv H. 
+  intros. generalize dependent t. icoinduction c CIH. intros. sinv H.
+  - reflexivity.  
   - taul. 
   (* Unset Printing Notations.  *)
     remember (observe (Ret a)).
-    induction REL; try easy. 
+    induction REL; try discriminate. 
     + eret. 
     + taul. now apply IHREL.  
 Qed.

@@ -281,22 +281,17 @@ Ltac genobs x ox := remember (observe x) as ox.
 Ltac genobs_clear x ox := genobs x ox; match goal with [H: ox = observe x |- _] => clear H x end.
 Ltac simpobs :=
   repeat match goal with
-  (* would be nice to 'eliminate' any 
-      obs-obs cases from the sarch, but not sure how.
-      maybe backtracking works here? *)
-  (* don't loop on the obs-obs case *)
   | H : observe _ = observe _ |- _ =>
-    rewrite <- H in *; clear H 
+    rewrite <- H in *; clear H
   | H : _ = observe _ |- _ =>
-    rewrite <- H in *
+    rewrite_everywhere_except (@eq_sym _ _ _ H) H
   | H : observe _ = _ |- _ =>
-    rewrite H in *
+    rewrite_everywhere_except H H
   | H : _ = _observe _ |- _ =>
-        rewrite <- H in *
+    rewrite_everywhere_except (@eq_sym _ _ _ H) H
   | H : _observe _ = _ |- _ =>
-    rewrite H in *
+    rewrite_everywhere_except H H
   end.
-(* wishing for an or pattern... *)
 Ltac desobs t H := destruct (observe t) eqn:H.
 
 (** ** Compute with fuel *)

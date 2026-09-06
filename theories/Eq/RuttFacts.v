@@ -151,19 +151,21 @@ Proof.
   induction Hrutt; intros; subst.
   1-3,6-8: inv Ht1; inv Ht2; simpobs; try now constructor.
   + simpobs. constructor. eapply IH; eauto.
+  + inversion CHECK. 
   + simpobs.
     dependent destruction H3; dependent destruction H4;
     dependent destruction H6; dependent destruction H7.
     constructor; auto. intros. eapply IH. apply REL. apply REL0. now apply H0.
   + simpobs. constructor. eapply IH; eauto.
+  + inversion CHECK. 
   + simpobs.
     dependent destruction H4; dependent destruction H5;
     dependent destruction H7; dependent destruction H8.
     constructor; auto. intros. eapply IH. apply REL. apply REL0. now apply H0.
-  + inv Ht1. constructor. eapply IHHrutt; eauto. now unstep.
-  + inv Ht2. constructor. eapply IHHrutt; eauto. now unstep.
-  + inv Ht1. constructor. eapply IHHrutt; eauto. now unstep.
-  + inv Ht2. constructor. eapply IHHrutt; eauto. now unstep.
+  + inv Ht1; try discriminate. constructor. eapply IHHrutt; eauto. now unstep.
+  + inv Ht2; try discriminate. constructor. eapply IHHrutt; eauto. now unstep.
+  + inv Ht1; try discriminate. constructor. eapply IHHrutt; eauto. now unstep.
+  + inv Ht2; try discriminate. constructor. eapply IHHrutt; eauto. now unstep.
 Qed.
 
 #[global] Instance eq_proper_rutt {E1 E2 R1 R2 REv RAns}
@@ -201,10 +203,10 @@ Proof.
   (* EqRet *)
   - clear x' y' Heqox' Heqoy'.
     genobs x ox. genret r1 or1. revert x Heqox.
-    hinduction EQx before ox; try easy.
+    hinduction EQx before ox; try discriminate.
     + intros; subst; inv Heqor1. clear x Heqox.
       genobs y oy. genret r2 or2. revert y Heqoy.
-      hinduction EQy before oy; try easy.
+      hinduction EQy before oy; try discriminate.
       * subst; intros [=<-] ? ?. constructor. auto.
       * intros. apply EqTauR; auto. eapply IHEQy; eauto.
     + intros; subst. apply EqTauL; auto. eapply IHEQx; eauto.
