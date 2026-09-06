@@ -745,13 +745,6 @@ Proof.
   specialize (RT a b a). apply RT; auto.
 Qed.
 
-Ltac PER_reflexivityH :=
-  match goal with
-  | [ H : ?R  ?X ?Y |- ?R  ?X ?X ] =>  eapply PER_reflexivityH1; eauto
-  | [ H : ?R  ?Y ?X |- ?R  ?X ?X ] =>  eapply PER_reflexivityH2; eauto
-  end; try apply per_symm ; try apply per_trans.
-
-
 Definition diagonal_prop {A : Type} (P : A -> Prop) : relationH A A :=
   fun x y => (P  x /\ P y).
 
