@@ -3,7 +3,7 @@
 From Coinduction Require Import all.
 Require Import Program.Tactics.
 
-Ltac inv H := inversion H; clear H; subst; try easy.
+Ltac inv H := inversion H; clear H; subst.
 
 (* [inv], [rewrite_everywhere], [..._except] are general purpose *)
 
