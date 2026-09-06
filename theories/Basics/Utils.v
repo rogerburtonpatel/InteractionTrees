@@ -104,8 +104,6 @@ Ltac saturate H :=
 (* [coinduction]-like tactics  *)
 
 (* Until https://github.com/damien-pous/coinduction/pull/22 gets merge *)
-Lemma pfp_gfp {X} {L : CompleteLattice X} (b : mon X): b (gfp b) <= (gfp b).
-Proof. apply b_chain. Qed.
 
   (* in goal: elem -> b elem -> gfp b -> b gfp *)
 
@@ -131,17 +129,6 @@ end.
 
 Tactic Notation "step" "in" ident(h) := step_in h.
 
-Ltac unstep :=
-match goal with
-| |- context [gfp ?b] => apply (gfp_pfp b)
-end.
-
-Ltac unstep_in h :=
-match type of h with
-| context [gfp ?b] => apply (pfp_gfp b) in h
-end.
-
-Tactic Notation "unstep" "in" ident(h) := unstep_in h.
 
 (* Oft-used induction tactic for general IHs. *)
 Tactic Notation "hinduction" hyp(IND) "before" hyp(H)
@@ -163,52 +150,3 @@ Ltac to_mon_in h :=
   progress (autorewrite with to_mon_obs in h; autorewrite with to_mon_go in h).
 Tactic Notation "to_mon" "in" ident(h) := to_mon_in h.
 
-Ltac apply_leq := match goal with 
-  | [H : _ <= _ |- _]=> intros; apply H 
-  | [H : leq _ _ |- _]=> intros; apply H 
-end.
-
-(* nonlinear pattern works here *)
-Ltac induct_on_premise := match goal with 
-| H: context [?rel _] |- context [?rel ] => induction H
-end. 
-
-Create HintDb mono. 
-
-Global Hint Extern 4 => apply_leq : mono.
-
-Ltac monauto := (solve [
-(* break `Proper`, introduce names and premises` *)
-cbv; 
-intros; 
-(* find hypothesis matching goal and proceed by cases *)
-solve [induct_on_premise; 
-(* break down each case as necessary. `solve` will backtrack in a helpful way.  *)
-try econstructor; 
-(* use monotonicity fact itself: [sim] <= [sim'] *)
-try apply_leq; 
-eauto]] || fail "`monauto` could not solve this goal."). 
-
-(* TODO: let user add a tactic db here *)
-(* ----------------------------------------------------------------- *)
-
-(* inf_closed automation *)
-Ltac inf_closed_forall_auto :=
-  repeat (apply inf_closed_all; intro).
-
-Ltac inf_closed_impl_auto :=
-  repeat (apply inf_closed_impl; [intros!; apply_leq; firstorder|]).
-
-Ltac inf_closed_final_auto :=
-  solve [repeat intro; try solve [firstorder]; try apply_leq ; firstorder].
-
-Ltac inf_closed_auto :=
-  repeat (inf_closed_forall_auto || inf_closed_impl_auto || inf_closed_final_auto).
-
-(* tower induction always leaves the goal with the form `forall _ : Chain, ...` ; 
-   match on this type and clear the old Chain *) 
-Ltac clear_old_chain := match goal with 
-  | c : ?T |- forall _ : ?T, _ => clear c; intro c end.
-
-Ltac tower_induction := apply tower; [inf_closed_auto|clear_old_chain].
-Tactic Notation "tower" "induction" := tower_induction.

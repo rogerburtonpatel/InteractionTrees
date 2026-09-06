@@ -309,12 +309,10 @@ Tactic Notation "unstep" := iunfold; try to_mon; unstep; try refold.
 Tactic Notation "unstep" "in" ident(h) :=
   iunfold_in h; try to_mon_in h; unstep_in h; try refold_in h.
 
-Ltac iunfold_coind :=
-  first [ intros ?; iunfold_coind; revert_last | iunfold ].
 
 Tactic Notation "coinduction"
   simple_intropattern(c) simple_intropattern(CIH) :=
-  repeat red; coinduction c CIH.
+  coinduction c CIH.
 
 Tactic Notation "coinduction" :=
   let c := fresh "c" in let CIH := fresh "CIH" in coinduction c CIH.
