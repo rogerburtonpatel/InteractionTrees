@@ -1764,10 +1764,6 @@ Proof.
   reflexivity.
 Qed.
 
-Ltac auto_ctrans :=
-  intros; repeat (match goal with [H: rcompose _ _ _ _ |- _] => destruct H end); subst; eauto.
-Ltac auto_ctrans_eq := try instantiate (1:=eq); auto_ctrans.
-
 Section eqit_h.
 
 Context {E : Type -> Type} {R1 R2 : Type} (RR : R1 -> R2 -> Prop).
@@ -2389,8 +2385,6 @@ Section eqit_elem.
 (*** *** Properties of the chain. *)
 
 Context {E : Type -> Type} {R1 R2} {RR : R1 -> R2 -> Prop} {b1 b2 : bool}.
-
-Ltac euttsimpl := unfold eutt, euttge, eq_itree, eqit in *. 
 
 Lemma Equivalence_elem_ff R RS (c : Chain (@eqit_mon E false false)) :
 Equivalence RS -> Equivalence (elem c R R RS).

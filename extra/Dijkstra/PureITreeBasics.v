@@ -21,8 +21,6 @@ Set Implicit Arguments.
 (** The itree Tau (Tau (Tau ...))*)
 #[local] Notation spin := ITree.spin.
 
-#[local] Tactic Notation "step" := repeat red; step. 
-#[local] Tactic Notation "step" "in" ident(h) := repeat red in h; step in h. 
 #[local] Tactic Notation "sinv" ident(h) := step in h; inv h. 
 
 (*this implies that if a spec w accepts spin, then bind w f should too?   *)
