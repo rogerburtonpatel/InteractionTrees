@@ -119,7 +119,7 @@ Lemma sutt_elim_tau_right {E R1 R2} (RR : R1 -> R2 -> Prop) :
     sutt RR t1 (Tau t2) ->
     sutt RR t1 t2.
 Proof.
-  unfold sutt at -1. icoinduction c CIH. intros t1 t2 H. step in H.
+  icoinduction c CIH. intros t1 t2 H. step in H.
   inv H.
   - eapply suttF_mono; [|exact EQTAUS].
     intros ?? ?. now apply (gfp_chain c).
@@ -214,7 +214,7 @@ Qed.
 : Proper (eq_itree eq ==> eq_itree eq ==> flip impl)
        (@sutt E R1 R2 r).
 Proof.
-  repeat red. coinduction c CIH. intros x y H x0 y0 H0 H1.
+  coinduction c CIH. intros x y H x0 y0 H0 H1.
   step in H. step in H0. step in H1.
   revert x H x0 H0.
   induction H1; intros.

@@ -497,7 +497,7 @@ Lemma trace_refine_all_infinite : forall (E : Type -> Type) (R : Type)
                                     (t : itree E R) (b : itrace E R),
     all_infinite t -> b ⊑ t -> all_infinite b.
 Proof.
-  intros E R. unfold all_infinite at -1. 
+  intros E R. 
   coinduction c CIH. 
   intros. step in H. step in H0. repeat red in H, H0; repeat red.   
   dependent induction H0.
@@ -539,7 +539,7 @@ Lemma trace_refine_diverge_bind : forall (E : Type -> Type) (R S : Type)
     all_infinite b -> b ⊑ t -> ITree.bind b f ⊑ ITree.bind t g.
 Proof.
   intros E R S b t f g. generalize dependent b. generalize dependent t.
-  red. icoinduction c CIH. intros.
+  icoinduction c CIH. intros.
   step in H0. 
   step in H. repeat red in H0, H. 
   dependent induction H0.
@@ -669,7 +669,7 @@ Lemma trace_refine_bind_cont_inv : forall (E : Type -> Type) (R S : Type)
                                           (f : R -> itree E S) (r : R),
     may_converge r b -> b ⊑ m -> ITree.bind b g ⊑ ITree.bind m f -> g r ⊑ f r.
 Proof.
-  intros E R S. red. coinduction c CIH. intros b m g f a Hconv Hrefb Hrefbind.
+  intros E R S. coinduction c CIH. intros b m g f a Hconv Hrefb Hrefbind.
   generalize  dependent m.
   dependent induction  Hconv; intros m Hrefb Hrefbind.
   - rewrite H in Hrefbind. rewrite bind_ret_l in Hrefbind. rewrite H in Hrefb.

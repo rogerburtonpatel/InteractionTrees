@@ -109,37 +109,14 @@ End RuttF.
 
 (** ** Rutt-specific tactics *)
 
-#[local] Ltac runfold    := unfold rutt.
-#[local] Ltac runfold_in h := unfold rutt in h.
-
 Ltac rcbn := cbn[rutt_mon body]; try unfold rutt_.
 Ltac rcbn_in H := cbn[rutt_mon body] in H; try unfold rutt_ in H.
 
 Tactic Notation "rcbn" "in" ident(h) := rcbn_in h.
-Tactic Notation "rcbn" "in" "*" := cbn[rutt_mon body] in *; try unfold rutt_ in *.
 
 (** [rstep] unfolds [rutt] one step, exposing the [ruttF] functor. *)
-Tactic Notation "rstep" := runfold; step; rcbn.
-Tactic Notation "rstep" "in" ident(h) := runfold_in h; step in h; rcbn in h.
-
-#[local] Ltac refold :=
-  repeat match goal with
-  | |- context[gfp (@rutt_mon ?E1 ?E2 ?R1 ?R2 ?RE ?RA)] =>
-      fold (@rutt E1 E2 R1 R2 RE RA)
-  end.
-
-Ltac fold_rutt :=
-  match goal with
-  | |- context[@ruttF ?E1 ?E2 ?R1 ?R2 ?REv ?RAns ?RR] =>
-      change (@ruttF E1 E2 R1 R2 REv RAns RR) with (body (@rutt_mon E1 E2 R1 R2 REv RAns RR))
-  end.
-Ltac fold_rutt_in h :=
-  match type of h with
-  | context[@ruttF ?E1 ?E2 ?R1 ?R2 ?REv ?RAns ?RR] =>
-      change (@ruttF E1 E2 R1 R2 REv RAns RR) with (body (@rutt_mon E1 E2 R1 R2 REv RAns RR)) in h
-  end.
-Tactic Notation "runstep" := fold_rutt; unstep.
-Tactic Notation "runstep" "in" ident(h) := fold_rutt_in h; unstep in h.
+Tactic Notation "rstep" := step; rcbn.
+Tactic Notation "rstep" "in" ident(h) := step in h; rcbn in h.
 
 Lemma rutt_to_mon_obs {E1 E2 R1 R2} REv RAns f (RR : R1 -> R2 -> Prop) t1 t2 :
   @ruttF E1 E2 R1 R2 REv RAns RR (f RR) (observe t1) (observe t2)

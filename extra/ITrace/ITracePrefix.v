@@ -243,7 +243,7 @@ Proof.
   dependent induction Heutt.
   - simpobs. clear x0 x. induction Hbp; auto with itree.
     +  constructor. eapply CIH; eauto.
-    + constructor. now do 2 ITree.Basics.Utils.step. 
+    + constructor. now do 2 Coinduction.tactics.step. 
   -  rewrite <- x0 in Hbp. simpobs. clear x0 x.
     destruct (observe b).
     + apply trace_prefix_ret.

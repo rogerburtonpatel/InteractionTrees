@@ -29,13 +29,13 @@ Definition euttNoRet {E} {A B : Type} (ta : itree E A) (tb : itree E B) :=
 
 Lemma euttNoRet_spin : forall (E : Type -> Type) (A B : Type), @euttNoRet E A B ITree.spin ITree.spin.
 Proof.
-  intros. unfold euttNoRet. icoinduction c CIH. cbn. constructor. exact CIH.
+  intros. icoinduction c CIH. cbn. constructor. exact CIH.
 Qed.
 
 Lemma noret_bind_nop : forall (E : Type -> Type) (A B : Type) (t : itree E A) (f : A -> itree E B),
     all_infinite t -> euttNoRet t (t >>= f).
 Proof.
-  intros E A B. unfold euttNoRet. icoinduction c CIH. intros t f Hdiv.
+  intros E A B. icoinduction c CIH. intros t f Hdiv.
   apply (gfp_fp all_infinite_mon) in Hdiv.
   cbn[all_infinite_mon body] in Hdiv. unfold all_infinite_ in Hdiv.
   inversion Hdiv; subst.
@@ -61,7 +61,7 @@ Lemma all_infinite_euttNoRet : forall (E : Type -> Type) (A B : Type) (R : A -> 
                             (ta : itree E A) (tb : itree E B),
     all_infinite ta -> eutt R ta tb -> euttNoRet ta tb.
 Proof.
-  intros E A B R. unfold euttNoRet. icoinduction c CIH. intros ta tb Hdiv Heutt.
+  intros E A B R. icoinduction c CIH. intros ta tb Hdiv Heutt.
   step in Heutt. cbn[eqit_mon body] in Heutt. unfold eqit_ in Heutt.
   cbn[eqit_mon body]. unfold eqit_.
   apply (gfp_fp all_infinite_mon) in Hdiv.
@@ -84,7 +84,7 @@ Qed.
 Lemma euttNoRet_all_infinite : forall (E : Type -> Type) (A B : Type) (t1 : itree E A) (t2 : itree E B),
     euttNoRet t1 t2 -> all_infinite t1.
 Proof.
-  intros E A B. unfold all_infinite. coinduction c CIH. intros t1 t2 H.
+  intros E A B. coinduction c CIH. intros t1 t2 H.
   cbn[all_infinite_mon body]. unfold all_infinite_.
   unfold euttNoRet in H. step in H. cbn[eqit_mon body] in H. unfold eqit_ in H.
   dependent induction H; try contradiction.
@@ -100,7 +100,7 @@ Qed.
 Lemma euttNoRet_sym : forall (E : Type -> Type) (A B : Type) (t1 : itree E A) (t2 : itree E B),
     euttNoRet t1 t2 -> euttNoRet t2 t1.
 Proof.
-  intros E A B. unfold euttNoRet. icoinduction c CIH. intros t1 t2 H.
+  intros E A B. icoinduction c CIH. intros t1 t2 H.
   unfold euttNoRet in H. step in H. cbn[eqit_mon body] in H. unfold eqit_ in H.
   dependent induction H; try contradiction.
   - rewrite <- x0. rewrite <- x. apply EqTau. apply CIH. auto.

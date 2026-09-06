@@ -339,7 +339,7 @@ Qed.  *)
   (c : Chain (pi_secure_eqit_mon Label priv RR b1 b2 l)) :
   Proper (eq_itree (E := E) eq ==> eq_itree eq ==> flip impl) (elem c).
 Proof.
-  do 5 red. tower induction. intros CIH t1 t2 H12 t3 t4 H34 Hpi.
+  tower induction. unfold Proper, respectful, Basics.flip, Basics.impl. intros CIH t1 t2 H12 t3 t4 H34 Hpi.
   icbn; icbn in Hpi. step in H12; step in H34. 
   induction Hpi; inv_eq_itree.
   (* ret and coinductive cases are simple *)

@@ -185,20 +185,14 @@ Proof.
   - etau.  
   - destruct (classic_empty B0).
     + constructor; auto. step. clear H1. clear CIH.
-    (* TOUR annoying: need coinduction bug fix *)
-    change (gfp (diverges_with_mon (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l) A) t)
-    with (diverges_with (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l) t) in H2. 
     generalize dependent t. coinduction c' CIH'. intros.
       sinv H2; use_simpobs.
       * rewrite H1. icbn; cbn. 
       unpriv_halt.  
-      * rewrite H1. icbn; cbn. unpriv_halt. eapply CIH'; eauto. apply H7. 
+      * rewrite H1. icbn; cbn. unpriv_halt.
     + cbn. unpriv_co. eapply CIH; eauto. apply H4.
   -  destruct (classic_empty B0).
     +  clear H4. clear CIH. step. 
-       change (diverges_with' (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l) B
-(gfp (diverges_with_mon (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e)
-l) B)) (observe t2)) with (diverges_with' (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l) B (diverges_with (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l)) (observe t2)) in H0.
       generalize dependent t2. coinduction c' CIH. intros.
       inversion H0; use_simpobs.
       * rewrite H4. icbn; cbn. unpriv_halt. eapply CIH; eauto. now step in H7. 
@@ -210,11 +204,6 @@ l) B)) (observe t2)) with (diverges_with' (fun (A : Type) (e : E2 A) => ~ leq (p
     + assert (diverges_with (fun _ e => ~ leq (priv2 _ e) l) (Vis e0 k0)) by 
        (step; constructor; auto). 
       rewrite <- H4. rewrite <- H4 in H9. clear H4. clear H1 CIH. step.
-      change (diverges_with' (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l) B
-      (gfp (diverges_with_mon (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l) B)) (observe t2))
-      with 
-      (diverges_with' (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l) B
-      (diverges_with (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l)) (observe t2)) in H0. 
       generalize dependent t2.
       coinduction c0 CIH. intros. sinv H9; use_simpobs.
       * rewrite H1. icbn; cbn. unpriv_halt. eapply CIH; eauto. now step in H4.  

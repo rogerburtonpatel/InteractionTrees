@@ -346,7 +346,7 @@ Proof.
            now rewrite H. 
         ++ apply simpobs in x. rewrite x in Hdiv. sinv Hdiv.
            ddestruction. apply H1.
-      * constructor. Utils.step. eapply IHeqitF; eauto.
+      * constructor. Coinduction.tactics.step. eapply IHeqitF; eauto.
          apply simpobs in x. rewrite x in Hdiv. rewrite tau_eutt in Hdiv. auto.
    + rewrite bind_ret_l in H0. cbn in H0. apply trace_refine_ret_inv_l in H0.
      rewrite H in Hdiv. sinv Hdiv. ddestruction.
