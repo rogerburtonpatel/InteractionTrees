@@ -2,6 +2,7 @@
 # PLEASE EDIT _CoqConfig INSTEAD
 
 -Q theories ITree
+-Q ../companion-and-tower/theories Coinduction
 
 theories/Simple.v
 theories/ITree.v
