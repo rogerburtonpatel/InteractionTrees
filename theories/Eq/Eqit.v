@@ -358,24 +358,6 @@ Ltac taul := apply EqTauL; [auto|].
 Ltac taur := apply EqTauR; [auto|]. 
 Ltac taus := apply EqTau. 
 
-(* inf_closed automation *)
-Ltac inf_closed_forall_auto := 
-  repeat (apply inf_closed_all; intro). 
-
-Ltac inf_closed_impl_auto := 
-  repeat (apply inf_closed_impl; [intros!; apply_leq; firstorder|]). 
-
-Ltac inf_closed_final_auto := 
-solve [repeat intro; try solve [firstorder]; try apply_leq ; firstorder]. 
-
-Ltac inf_closed_auto := 
-repeat (inf_closed_forall_auto || inf_closed_impl_auto || inf_closed_final_auto). 
-
-Ltac clear_old_chain := match goal with | c : ?T |- forall _ : ?T, _ 
- => clear c; intro c end. 
-
-Ltac tower_induction := apply tower; [inf_closed_auto|clear_old_chain].
-Tactic Notation "tower" "induction" := tower_induction. 
 
 
 Module step_notation_tests. 
