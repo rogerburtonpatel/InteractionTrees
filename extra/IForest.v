@@ -273,7 +273,7 @@ Proof. reflexivity. Qed.
   iunfold_in h; try to_mon_in h; unstep_in h; try refold_in h.
 
 #[local] Tactic Notation "icoinduction" simple_intropattern(R) simple_intropattern(H) :=
-  iunfold_coind; coinduction R H; icbn.
+  coinduction R H; icbn.
 
 #[local] Tactic Notation "coinduction" simple_intropattern(R) simple_intropattern(H) :=
   icoinduction R H;
