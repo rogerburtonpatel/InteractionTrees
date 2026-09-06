@@ -147,6 +147,22 @@ Tactic Notation "unstep" "in" ident(h) := unstep_in h.
 Tactic Notation "hinduction" hyp(IND) "before" hyp(H)
   := move IND before H; revert_until IND; induction IND.
 
+Ltac under_forall tac :=
+  let guard := fresh "guard" in
+  assert (guard : True) by constructor;
+  intros;
+  tac ();
+  revert_until guard;
+  clear guard.
+
+Ltac to_mon_core :=
+  cbn; progress (autorewrite with to_mon_obs; autorewrite with to_mon_go).
+Ltac to_mon := under_forall ltac:(fun _ => to_mon_core).
+Ltac to_mon_in h :=
+  cbn in h;
+  progress (autorewrite with to_mon_obs in h; autorewrite with to_mon_go in h).
+Tactic Notation "to_mon" "in" ident(h) := to_mon_in h.
+
 Ltac apply_leq := match goal with 
   | [H : _ <= _ |- _]=> intros; apply H 
   | [H : leq _ _ |- _]=> intros; apply H 
