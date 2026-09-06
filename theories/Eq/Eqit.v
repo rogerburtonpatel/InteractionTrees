@@ -267,76 +267,23 @@ Ltac refold_in h :=
    be canonical; i.e. not to have both (observe (Ret r)) and (RetF r).
    
    *)
-Ltac to_mon_core :=
-cbn; match goal with
-| |- context[@eqitF ?E ?R1 ?R2 ?RR ?b1 ?b2 (?f ?R1 ?R2 ?RR)
-                   (observe ?t1) (observe ?t2)] =>
-      change (eqitF RR b1 b2 (f R1 R2 RR)
-                    (observe t1) (observe t2))
-      with (eqit_mon b1 b2 f R1 R2 RR t1 t2)
-| |- context[@eqitF ?E ?R1 ?R2 ?RR ?b1 ?b2 (?f ?R1 ?R2 ?RR)
-                   (?con1 ?a1) (?con2 ?a2)] =>
-      change (eqitF RR b1 b2 (f R1 R2 RR)
-                    (con1 a1) (con2 a2))
-      with (eqit_mon b1 b2 f R1 R2 RR
-                    (go (con1 a1)) (go (con2 a2)))
-| |- context[@eqitF ?E ?R1 ?R2 ?RR ?b1 ?b2 (?f ?R1 ?R2 ?RR)
-                   (?con ?a) (observe ?t2)] =>
-      change (eqitF RR b1 b2 (f R1 R2 RR)
-                    (con a) (observe t2))
-      with (eqit_mon b1 b2 f R1 R2 RR
-                    (go (con a)) t2)
-| |- context[@eqitF ?E ?R1 ?R2 ?RR ?b1 ?b2 (?f ?R1 ?R2 ?RR)
-                   (observe ?t1) (?con ?a)] =>
-      change (eqitF RR b1 b2 (f R1 R2 RR)
-                    (observe t1) (con a))
-      with (eqit_mon b1 b2 f R1 R2 RR
-                    t1 (go (con a)))
-end.
+Lemma eqit_to_mon_obs {E R1 R2} b1 b2 f (RR : R1 -> R2 -> Prop) t1 t2 :
+  @eqitF E R1 R2 RR b1 b2 (f R1 R2 RR) (observe t1) (observe t2)
+  = eqit_mon b1 b2 f R1 R2 RR t1 t2.
+Proof. reflexivity. Qed.
 
-(* A trick to make [to_mon] work under [forall]. *)
-Ltac to_mon := 
-let guard := fresh "guard" in   
-assert (guard : True) by constructor; 
-          intros; 
-          to_mon_core; 
-          revert_until guard; 
-          clear guard. 
+Lemma eqit_to_mon_go {E R1 R2} b1 b2 f (RR : R1 -> R2 -> Prop) x y :
+  @eqitF E R1 R2 RR b1 b2 (f R1 R2 RR) x y
+  = eqit_mon b1 b2 f R1 R2 RR (go x) (go y).
+Proof. reflexivity. Qed.
 
-Ltac to_mon_in h :=
-  cbn in h; match type of h with
-| context[@eqitF ?E ?R1 ?R2 ?RR ?b1 ?b2 (?f ?R1 ?R2 ?RR)
-                   (observe ?t1) (observe ?t2)] =>
-      change (eqitF RR b1 b2 (f R1 R2 RR)
-                    (observe t1) (observe t2))
-      with (eqit_mon b1 b2 f R1 R2 RR t1 t2) in h 
-| context[@eqitF ?E ?R1 ?R2 ?RR ?b1 ?b2 (?f ?R1 ?R2 ?RR)
-                   (?con1 ?a1) (?con2 ?a2)] =>
-      change (eqitF RR b1 b2 (f R1 R2 RR)
-                    (con1 a1) (con2 a2))
-      with (eqit_mon b1 b2 f R1 R2 RR
-                    (go (con1 a1)) (go (con2 a2))) in h
-| context[@eqitF ?E ?R1 ?R2 ?RR ?b1 ?b2 (?f ?R1 ?R2 ?RR)
-                   (?con ?a) (observe ?t2)] =>
-      change (eqitF RR b1 b2 (f R1 R2 RR)
-                    (con a) (observe t2))
-      with (eqit_mon b1 b2 f R1 R2 RR
-                    (go (con a)) t2) in h
-| context[@eqitF ?E ?R1 ?R2 ?RR ?b1 ?b2 (?f ?R1 ?R2 ?RR)
-                   (observe ?t1) (?con ?a)] =>
-      change (eqitF RR b1 b2 (f R1 R2 RR)
-                    (observe t1) (con a))
-      with (eqit_mon b1 b2 f R1 R2 RR
-                    t1 (go (con a))) in h
-end.
-
-(** --- Orchestration via the [Utils.v] generics. --- *)
+#[global] Hint Rewrite @eqit_to_mon_obs : to_mon_obs.
+#[global] Hint Rewrite @eqit_to_mon_go  : to_mon_go.
 
 Tactic Notation "icbn" "in" ident(h) := icbn_in h.
 #[local] Tactic Notation "icbn" "in" "*" := cbn [eqit_mon body eqit_] in *.
 
 Tactic Notation "refold" "in" ident(h) := refold_in h.
-Tactic Notation "to_mon" "in" ident(h) := to_mon_in h.
 Tactic Notation "iunfold" "in" ident(h) := iunfold_in h.
 Tactic Notation "iunfold" "in" "*" := iunfold_all.
 

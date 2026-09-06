@@ -234,31 +234,20 @@ Definition interp_iforest {E F} (h_spec : E ~> iforest F) :
   revert_until dummy;
   clear dummy.
 
-#[local] Ltac to_mon_in h :=
-  match type of h with
-  | context[
-      @interp_iforestF ?E ?F ?h_spec ?R ?RR ?sim
-        (observe ?t0) ?t1
-    ] =>
-      change (interp_iforestF h_spec RR sim (observe t0) t1)
-      with (interp_iforest_mon E F h_spec R RR sim t0 t1) in h
+#[local] Lemma iforest_to_mon_obs E F h_spec R RR sim t0 t1 :
+  @interp_iforestF E F h_spec R RR sim (observe t0) t1
+  = interp_iforest_mon E F h_spec R RR sim t0 t1.
+Proof. reflexivity. Qed.
 
-  | context[
-      @interp_iforestF ?E ?F ?h_spec ?R ?RR ?sim
-        (?con1 ?a1) ?t1
-    ] =>
-      change (interp_iforestF h_spec RR sim (con1 a1) t1)
-      with (interp_iforest_mon E F h_spec R RR
-              sim (go (con1 a1)) t1) in h
-  end.
+#[local] Lemma iforest_to_mon_go E F h_spec R RR sim x t1 :
+  @interp_iforestF E F h_spec R RR sim x t1
+  = interp_iforest_mon E F h_spec R RR sim (go x) t1.
+Proof. reflexivity. Qed.
 
-#[local] Ltac icbn :=
-  cbn[eqit_mon body eqit_ interp_iforest_mon interp_iforest_];
-  try unfold interp_iforest_. 
-
-#[local] Ltac icbn_in H :=
-  cbn[eqit_mon body eqit_ interp_iforest_mon interp_iforest_] in H;
-  try unfold interp_iforest_ in H.
+#[local] Lemma iforest_to_mon_ E F h_spec R RR sim t0 t1 :
+  @interp_iforest_ E F h_spec R RR sim t0 t1
+  = interp_iforest_mon E F h_spec R RR sim t0 t1.
+Proof. reflexivity. Qed.
 
 #[local] Tactic Notation "icbn" "in" ident(h) := icbn_in h.
 #[local] Tactic Notation "icbn" "in" "*" :=
@@ -295,10 +284,10 @@ Definition interp_iforest {E F} (h_spec : E ~> iforest F) :
   let CIH := fresh "CIH" in
   coinduction c CIH.
 
-#[local] Ltac bcbn :=
-  cbn[eqit_mon body eqit_ interp_iforest_mon interp_iforest_];
-  cbn; 
-  to_mon.
+#[local] Hint Rewrite iforest_to_mon_   : to_mon_obs.
+#[local] Hint Rewrite iforest_to_mon_obs : to_mon_obs.
+#[local] Hint Rewrite iforest_to_mon_go  : to_mon_go.
+#[local] Ltac bcbn := cbn; to_mon.
   
 (* step -> inversion; common pattern for eutt Hyps *)
 Ltac sinv H := step in H; inv H. 
