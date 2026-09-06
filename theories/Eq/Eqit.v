@@ -226,10 +226,6 @@ Arguments eqit_mon {E} b1 b2.
 
 (** --- Per-relation hooks for the [eqit] family. --- *)
 
-#[local] Ltac iunfold      := unfold euttge, eq_itree, eutt, eqit.
-#[local] Ltac iunfold_in h := unfold euttge, eq_itree, eutt, eqit in h.
-#[local] Ltac iunfold_all  := unfold euttge, eq_itree, eutt, eqit in *.
-
 (* Unfolding tactics for bisimulations. *)
 (* Generally, these are used to go from [eqit_mon] to [eqitF]. *)
 (* Sometimes you will call these manually. *)
@@ -284,19 +280,14 @@ Tactic Notation "icbn" "in" ident(h) := icbn_in h.
 #[local] Tactic Notation "icbn" "in" "*" := cbn [eqit_mon body eqit_] in *.
 
 Tactic Notation "refold" "in" ident(h) := refold_in h.
-Tactic Notation "iunfold" "in" ident(h) := iunfold_in h.
-Tactic Notation "iunfold" "in" "*" := iunfold_all.
 
 #[global] Ltac step := 
 (match goal with 
 | |- context[elem _] => idtac 
 | |- _ => 
 repeat red end)
-; ITree.Basics.Utils.step; icbn; try refold.
+; Coinduction.tactics.step; icbn; try refold.
 
-
-(* Tactic Notation "step" "in" ident(h) :=
-iunfold in h; step in h; icbn in h; try refold_in h. *)
 
 Tactic Notation "step" "in" ident(h) :=
   repeat red in h; step in h;
@@ -305,18 +296,16 @@ Tactic Notation "step" "in" ident(h) :=
   | _ => idtac
   end; try refold in h. 
 
-Tactic Notation "unstep" := iunfold; try to_mon; unstep; try refold.
+Tactic Notation "unstep" := unfold euttge, eq_itree, eutt, eqit; try to_mon; unstep; try refold.
 Tactic Notation "unstep" "in" ident(h) :=
-  iunfold_in h; try to_mon_in h; unstep_in h; try refold_in h.
+  unfold euttge, eq_itree, eutt, eqit in h; try to_mon_in h; unstep_in h; try refold_in h.
 
 
-Tactic Notation "coinduction"
-  simple_intropattern(c) simple_intropattern(CIH) :=
+Tactic Notation "coinduction" ident(c) simple_intropattern(CIH) :=
   coinduction c CIH.
 
 Tactic Notation "coinduction" :=
   let c := fresh "c" in let CIH := fresh "CIH" in coinduction c CIH.
-
 
 Tactic Notation "icoinduction"
     simple_intropattern(R) simple_intropattern(H) :=
@@ -336,26 +325,10 @@ Ltac apply_foralls :=
   | w : ?A, H : forall _ : ?A, _ |- _ => apply (H w)
   end.
 
-(* [solve_eqitF] tries to solve a goal with a variant of [eqitF] by
-   simplifiying, rewriting, and trying to apply assumptions. *)
-
-Ltac solve_eqitF := 
-  (* reduce to 'observe' form by stripping constructors and unfolding *)
-  iunfold; icbn in *; try econstructor; 
-  (* replace 'observe' with actual constructor values *)
-  simpobs; 
-  (* finish off *)
-  try econstructor; intros; eauto with itree. 
-
-(* [taul] and [taur] peel off a tau from either side when the CHECK flag for
-   that side is set. Their primary purpose is to make proofs more readable. 
-   [taus] is simply the [EqTau] constructor, and serves the same purpose. 
-   *)
 
 Ltac taul := apply EqTauL; [auto|].
 Ltac taur := apply EqTauR; [auto|]. 
 Ltac taus := apply EqTau. 
-
 
 
 Module step_notation_tests. 
@@ -640,19 +613,11 @@ Proof.
   reflexivity.
 Qed.
 
-Lemma inf_closed_Symmetric_at :
-  inf_closed (X := forall R1 R2, (R1 -> R2 -> Prop) -> itree E R1 -> itree E R2 -> Prop)
-    (fun x => Symmetric (x R R RR)).
-Proof.
-  intros T HT x y Hxy.
-  intros z Hz. apply HT; auto.
-Qed.
-
 #[global] Instance Symmetric_elem (b: bool) (HS : Symmetric RR)
   {c: Chain (@eqit_mon E b b)}: Symmetric (elem c R R RR).
 Proof.
-  revert c. apply (tower inf_closed_Symmetric_at).
-  intros c Hsym. intros!. apply Symmetric_eqitF; auto.
+  tower induction.
+  intros Hsym. intros!. apply Symmetric_eqitF; auto.
 Qed.
 
 End eqit_gen.
@@ -1176,10 +1141,8 @@ Qed.
 #[global] Instance Transitive_elem {E R RR} (HT : Transitive RR)
   {c: Chain (@eqit_mon E false false)}: Transitive (elem c R R RR).
 Proof.
-  assert (Hinf : inf_closed (X := forall R1 R2, (R1 -> R2 -> Prop) -> itree E R1 -> itree E R2 -> Prop)
-    (fun x => Transitive (x R R RR))).
-  { intros T HTr x y z Hxy Hyz i Hi. apply (HTr _ Hi) with y; [exact (Hxy i Hi) | exact (Hyz i Hi)]. }
-  revert c. apply (tower Hinf). intros c Htrans.
+  tower induction.
+  intros Htrans.
   intros!. icbn in *. eapply Transitive_eqitF; eauto.
 Qed.
 
@@ -1569,7 +1532,6 @@ intros!; unfold flip, eq_itree in *.
   *)
   (* We use a mix of foreward and backward reasoning. *)
   
-  idtac. 
   (* build arrows and strengthen *)
   assert (rcompose RR1 RS <= RS) by (intros ? ? [? ?]; eauto). 
   assert (rcompose RS (flip RR2) <= RS) by (intros ? ? [? ?]; eauto).

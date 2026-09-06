@@ -50,7 +50,7 @@ Definition any_infinite {E X} : itree E X -> Prop :=
 Instance any_infinite_proper_eutt {E X R} : Proper (eutt R ==> iff) (@any_infinite E X).
 Proof.
   intros t1 t2 Ht. split; intros Hinf.
-  - revert t2 t1 Ht Hinf. unfold any_infinite at 2. coinduction c CIH.
+  - revert t2 t1 Ht Hinf. coinduction c CIH.
     intros t2 t1 Ht Hinf. step in Ht. cbn[eqit_mon body] in Ht. unfold eqit_ in Ht.
     cbn[any_infinite_mon body]. unfold any_infinite_.
     apply (gfp_fp any_infinite_mon) in Hinf.
@@ -65,7 +65,7 @@ Proof.
       cbn[any_infinite_mon body] in H0. unfold any_infinite_ in H0. exact H0.
     + constructor. step. cbn[any_infinite_mon body]. unfold any_infinite_.
       apply IHHt. exact Hinf.
-  - revert t1 t2 Ht Hinf. unfold any_infinite at 2. coinduction c CIH.
+  - revert t1 t2 Ht Hinf. coinduction c CIH.
     intros t1 t2 Ht Hinf. step in Ht. cbn[eqit_mon body] in Ht. unfold eqit_ in Ht.
     cbn[any_infinite_mon body]. unfold any_infinite_.
     apply (gfp_fp any_infinite_mon) in Hinf.
@@ -84,7 +84,7 @@ Qed.
 
 Theorem spin_infinite {E A} : @any_infinite E A ITree.spin.
 Proof.
-  unfold any_infinite. coinduction c CIH.
+  coinduction c CIH.
   cbn[any_infinite_mon body]. unfold any_infinite_. cbn.
   constructor. exact CIH.
 Qed.
@@ -140,7 +140,7 @@ Ltac contra_void := try match goal with | a : void |- _ => contradiction end.
 Instance eutt_proper_all_infinite {E A R} : Proper (eutt R ==> iff) (@all_infinite E A).
 Proof.
   intros t1 t2 Ht. split; intros Hinf.
-  - revert t1 t2 Ht Hinf. unfold all_infinite at 2. coinduction c CIH.
+  - revert t1 t2 Ht Hinf. coinduction c CIH.
     intros t1 t2 Ht Hinf. step in Ht. cbn[eqit_mon body] in Ht. unfold eqit_ in Ht.
     cbn[all_infinite_mon body]. unfold all_infinite_.
     apply (gfp_fp all_infinite_mon) in Hinf.
@@ -155,7 +155,7 @@ Proof.
       cbn[all_infinite_mon body] in H0. unfold all_infinite_ in H0. exact H0.
     + constructor. step. cbn[all_infinite_mon body]. unfold all_infinite_.
       apply IHHt. exact Hinf.
-  - revert t1 t2 Ht Hinf. unfold all_infinite at 2. coinduction c CIH.
+  - revert t1 t2 Ht Hinf. coinduction c CIH.
     intros t1 t2 Ht Hinf. step in Ht. cbn[eqit_mon body] in Ht. unfold eqit_ in Ht.
     cbn[all_infinite_mon body]. unfold all_infinite_.
     apply (gfp_fp all_infinite_mon) in Hinf.
@@ -175,7 +175,7 @@ Qed.
 Lemma not_converge_to_all_infinite : forall (E : Type -> Type) (A : Type) (t : itree E A),
     (forall a, ~ may_converge a t) -> all_infinite t.
 Proof.
-  intros E A. unfold all_infinite. coinduction c CIH. intros t Hcon.
+  intros E A. coinduction c CIH. intros t Hcon.
   cbn[all_infinite_mon body]. unfold all_infinite_.
   destruct (observe t) eqn:Heq;
     specialize (itree_eta t) as Ht; rewrite Heq in Ht.

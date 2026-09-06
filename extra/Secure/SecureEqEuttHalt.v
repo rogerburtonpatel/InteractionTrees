@@ -236,7 +236,7 @@ Definition classic_empty := Secure.Labels.classic_empty.
     Proper (eutt eq ==> eq ==> Basics.flip Basics.impl)
      (elem c).
 Proof.
-  do 5 red. tower induction; subst. 
+  tower induction. unfold Proper, respectful, Basics.flip, Basics.impl; subst. 
   clear c. intros c. intros CIH t1 t1' Heutt t2 _ <- Hsec. 
   step in Heutt. icbn; icbn in Hsec.  
   hinduction Heutt before E; intros; subst; auto with itree.
@@ -1108,7 +1108,7 @@ Qed. *)
     Proper (@eq_itree E _ _ eq ==> eq ==> Basics.flip Basics.impl)
      (elem c).
 Proof.
-  do 5 red. tower induction; subst. 
+  tower induction. unfold Proper, respectful, Basics.flip, Basics.impl; subst. 
   clear c. intros c. intros CIH t1 t1' Heutt t2 _ <- Hsec. 
   step in Heutt. icbn; icbn in Hsec.  
   hinduction Heutt before E; intros; subst; auto with itree.

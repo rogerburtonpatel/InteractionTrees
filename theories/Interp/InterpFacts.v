@@ -146,10 +146,10 @@ Proof.
   intros until T.
   coinduction. intros.
   rewrite !unfold_interp. step in H0. 
-  induction H0; intros; subst; cbn; eauto 4 with itree; to_mon.   
-  eapply eqit_bind_chain. 
-  - do 2 step. apply H. 
-  - intros ??[=<-]. taus; eauto 4 with itree. 
+  induction H0; intros; subst; cbn; eauto 4 with itree. 
+  - to_mon. eapply eqit_bind_chain. 
+    + do 2 step. apply H. 
+    + intros ??[=<-]. taus; eauto 4 with itree. 
   - taul. to_mon. rewrite unfold_interp. apply IHeqitF. 
   - taur. to_mon. rewrite unfold_interp. apply IHeqitF. 
 Qed. 

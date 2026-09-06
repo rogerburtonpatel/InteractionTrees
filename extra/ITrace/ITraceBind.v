@@ -23,7 +23,7 @@ Import Monads.
 Import MonadNotation.
 Local Open Scope monad_scope.
 
-#[local] Tactic Notation "simple_step" := ITree.Basics.Utils.step. 
+#[local] Tactic Notation "simple_step" := Coinduction.tactics.step. 
 
 (* Contains the proof of peel_lemma which allows us
    to decompose a trace of bind t f into a head that refines t and a tail
@@ -537,9 +537,9 @@ Proof.
   (* todo: this *)
   - destruct (observe b') eqn : Hb; destruct (observe b) eqn : Hb'; inversion H; subst; cbn;
       try solve [to_mon; constructor; eauto; now do 2 step]. 
-    + taus. now do 2 Utils.step.  
+    + taus. now do 2 Coinduction.tactics.step.  
       + ddestruction. constructor. intros. inv H. 
-      ddestruction. do 2 Utils.step. apply REL0. 
+      ddestruction. do 2 Coinduction.tactics.step. apply REL0. 
   (*looks like I didn't actually need to induct here ... *)
   - dependent induction H; try clear IHeqitF.
     + simpobs. cbn. etau.    
@@ -616,7 +616,7 @@ Proof.
   - simpobs. destruct (observe b) eqn : Heqb; red; cbn.
     + constructor; eauto. rewrite <- Heqb. eapply IHeqitF; eauto.
     + cbn. destruct (observe t') eqn : Heqt'; cbn.
-      * constructor.  Utils.step.  
+      * constructor.  Coinduction.tactics.step.  
         unstep in H. eapply peel_cont_ret_inv with (b := t0) in H. step.
         rewrite H. reflexivity. 
       * constructor. eapply CIH; eauto. setoid_rewrite <- tau_eutt at 2.
@@ -630,7 +630,7 @@ Proof.
       *
       symmetry in H. unstep in H. 
       eapply peel_cont_ret_inv with (b := t0) in H. cbn in H. 
-      taus. symmetry. now do 2 Utils.step. 
+      taus. symmetry. now do 2 Coinduction.tactics.step. 
       * constructor. eapply CIH.  rewrite <- tau_eutt at 1. step. auto.
       * constructor. rewrite <- Heqt. eapply CIH.
         step. rewrite Heqt. auto.

@@ -92,44 +92,6 @@ Ltac crunch :=
           | [ |- _ /\ _ ] => split
           end.
 
-Ltac saturate H :=
-  match goal with
-          | [ H1 : forall a b, ?R a b -> _,
-              H2 : forall a b, ?R b a -> _,
-                H : ?R ?A ?B  |- _ ] => pose proof (H1 A B H);
-                                        pose proof (H2 B A H);
-                                        clear H; crunch
-          end.
-
-(* [coinduction]-like tactics  *)
-
-(* Until https://github.com/damien-pous/coinduction/pull/22 gets merge *)
-
-  (* in goal: elem -> b elem -> gfp b -> b gfp *)
-
-Ltac step_ :=
-  match goal with
-  | |- gfp ?b ?x ?y ?z => apply ((gfp_fp b x y z))
-  | |- elem ?R ?x ?y ?z => apply (b_chain R x y z)
-  | |- gfp ?b ?x ?y => apply ((gfp_fp b x y))
-  | |- elem ?R ?x ?y => apply (b_chain R x y)
-  | |- gfp ?b ?x => apply ((gfp_fp b x))
-  | |- elem ?R ?x => apply (b_chain R x)
-  end.
-
-Ltac step := match goal with
-    | |- context [gfp ?b] => apply (pfp_gfp b)
-    | |- context [elem ?R] => first [apply (b_chain R) | apply (gfp_bchain R)]
-    end. 
-
-Ltac step_in h :=
-match type of h with
-| context [gfp ?b] => apply (gfp_pfp b) in h
-end.
-
-Tactic Notation "step" "in" ident(h) := step_in h.
-
-
 (* Oft-used induction tactic for general IHs. *)
 Tactic Notation "hinduction" hyp(IND) "before" hyp(H)
   := move IND before H; revert_until IND; induction IND.
@@ -149,4 +111,3 @@ Ltac to_mon_in h :=
   cbn in h;
   progress (autorewrite with to_mon_obs in h; autorewrite with to_mon_go in h).
 Tactic Notation "to_mon" "in" ident(h) := to_mon_in h.
-

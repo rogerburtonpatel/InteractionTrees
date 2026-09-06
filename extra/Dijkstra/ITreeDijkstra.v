@@ -238,7 +238,7 @@ Section ITreeDijkstra.
     - coinduction c CIH. intros.
       cbn; red.
       red in H; sinv H; auto with itree.
-    - unfold bisim at 3. coinduction c CIH. intros. cbn; red.
+    - coinduction c CIH. intros. cbn; red.
       red in H; sinv H; red in H0; sinv H0; auto with itree.
       + rewrite <- H in H3. discriminate.
       + rewrite <- H2 in H4. discriminate.
@@ -398,7 +398,7 @@ step on gfp can reduce.
 
   Instance proper_eventless_imp {E1 R} : Proper (eutt eq ==> Basics.impl) (@eventless E1 R) .
   Proof.
-    repeat red. coinduction c CIH.
+    coinduction c CIH.
     intros t1 t2 Heutt Hev.
     step in Heutt. icbn.
     assert (Hev' := Hev). step in Hev.

@@ -40,9 +40,6 @@ Ltac unfold_ktree :=
 (** ** [ITree.aloop] *)
 
 
-From Corelib Require Import Program.Tactics. 
-
-
 Lemma bind_iter {E A B C} (f : A -> itree E (A + B)) (g : B -> itree E (B + C))
   : forall x,
     (ITree.bind (ITree.iter f x) (ITree.iter g))
@@ -52,7 +49,7 @@ Lemma bind_iter {E A B C} (f : A -> itree E (A + B)) (g : B -> itree E (B + C))
        | inr b => ITree.map (bimap inr (id_ _)) (g b)
        end) (inl x).
 Proof.
-  coinduction. 
+  coinduction c CIH. 
   (* this proof should follow from the facts about elem *)
   intros.
   (* Unset Printing Notations.  *)
@@ -66,8 +63,7 @@ Proof.
     eapply CIH. 
   - rewrite bind_ret_l, tau_euttge.
     
-  (* question: why doesn't accumulate acc work? *)
-    do 2 step. revert b. coinduction. intros. 
+    do 2 step. revert b. coinduction c' CIH'. intros.
     rewrite !unfold_iter.
     rewrite bind_map.
     ebind. 
