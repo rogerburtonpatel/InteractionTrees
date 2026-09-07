@@ -169,35 +169,29 @@ Proof.
     rewrite <- itree_eta in H1. now rewrite tau_euttge.
 Qed.
 
-(** Helper: inversion of [ruttF] at [TauF] on the left. *)
-Lemma ruttF_inv_tau_l t1 ot2 :
-  ruttF REv RAns RR (rutt REv RAns RR) (TauF t1) ot2 ->
-  ruttF REv RAns RR (rutt REv RAns RR) (observe t1) ot2.
+(** Helper: inversion of [rutt] at [Tau] on the left. *)
+Lemma rutt_inv_Tau_l t1 t2 :
+  rutt REv RAns RR (Tau t1) t2 -> rutt REv RAns RR t1 t2.
 Proof.
-  intros H. remember (TauF t1) as tt1.
+  intros H. step in H. cbn in H. step.
+    remember (TauF t1) as tt1.
   induction H; try discriminate.
   - inv Heqtt1. constructor. step in H. exact H.
   - inv Heqtt1. assumption. 
   - constructor. auto.
 Qed.
 
-(** Helper: inversion of [ruttF] at [TauF] on the right. *)
-Lemma ruttF_inv_tau_r ot1 t2 :
-  ruttF REv RAns RR (rutt REv RAns RR) ot1 (TauF t2) ->
-  ruttF REv RAns RR (rutt REv RAns RR) ot1 (observe t2).
+(** Helper: inversion of [rutt] at [Tau] on the right. *)
+
+Lemma rutt_inv_Tau_r t1 t2 :
+  rutt REv RAns RR t1 (Tau t2) -> rutt REv RAns RR t1 t2.
 Proof.
-  intros H. remember (TauF t2) as tt2.
+  intros H. step in H. cbn in H. step.
+  remember (TauF t2) as tt2.
   induction H; try discriminate.
   - inv Heqtt2. constructor. step in H. exact H.
   - constructor. auto.
   - inv Heqtt2. assumption. 
-Qed.
-
-Lemma rutt_inv_Tau_l t1 t2 :
-  rutt REv RAns RR (Tau t1) t2 -> rutt REv RAns RR t1 t2.
-Proof.
-  intros. step in H. step.
-  apply ruttF_inv_tau_l. exact H.
 Qed.
 
 Lemma rutt_add_Tau_l t1 t2 :
@@ -206,12 +200,6 @@ Proof.
   intros. step. constructor. step in H. exact H.
 Qed.
 
-Lemma rutt_inv_Tau_r t1 t2 :
-  rutt REv RAns RR t1 (Tau t2) -> rutt REv RAns RR t1 t2.
-Proof.
-  intros. step in H. step.
-  apply ruttF_inv_tau_r. exact H.
-Qed.
 
 Lemma rutt_add_Tau_r t1 t2 :
   rutt REv RAns RR t1 t2 -> rutt REv RAns RR t1 (Tau t2).

@@ -311,7 +311,7 @@ Proof.
         ** apply EqTauL. apply IHIHHeutt'; auto.
       * (* m1 = Tau m1_body *)
         apply (IHIHHeutt' m1_body m2); auto.
-        apply ruttF_inv_tau_l in H. exact H.
+        unstep. apply rutt_inv_Tau_l. now step. 
       * (* m1 = Vis e1 k1 *)
         remember (VisF e1 k1) as oVisL eqn:HoVisL.
         clear Hobs_m1 m1 IHIHHeutt'.
