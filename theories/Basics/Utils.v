@@ -19,11 +19,6 @@ Ltac rewrite_everywhere_except lem X :=
                  match H with X => fail 1 | _ => rewrite lem in H end
              end); repeat rewrite lem).
 
-
-Ltac copy h :=
-  let foo := fresh "cpy" in
-  assert (foo := h).
-
 Global Tactic Notation "intros !" := repeat intro.
 
 Ltac flatten_goal :=
@@ -84,20 +79,6 @@ Ltac appn f :=
     | [ id: f _ _ _ _ _ _ _ _ |- _ ] => apply id
     end.
 
-(* eapply by name of the Inductive relation *)
-Ltac eappn f :=
-    match goal with
-    | [ id: f |- _ ] => eapply id
-    | [ id: f _ |- _ ] => eapply id
-    | [ id: f _ _ |- _ ] => eapply id
-    | [ id: f _ _ _ |- _ ] => eapply id
-    | [ id: f _ _ _ _ |- _ ] => eapply id
-    | [ id: f _ _ _ _ _ |- _ ] => eapply id
-    | [ id: f _ _ _ _ _ _ |- _ ] => eapply id
-    | [ id: f _ _ _ _ _ _ _ |- _ ] => eapply id
-    | [ id: f _ _ _ _ _ _ _ _ |- _ ] => eapply id
-    end.
-
 Ltac break H :=
   repeat match type of H with
           | exists X, _  => destruct H
@@ -114,32 +95,11 @@ Ltac crunch :=
           | [ |- _ /\ _ ] => split
           end.
 
-Ltac saturate H :=
-  match goal with
-          | [ H1 : forall a b, ?R a b -> _,
-              H2 : forall a b, ?R b a -> _,
-                H : ?R ?A ?B  |- _ ] => pose proof (H1 A B H);
-                                        pose proof (H2 B A H);
-                                        clear H; crunch
-          end.
-
 (* [coinduction]-like tactics  *)
 
 (* Until https://github.com/damien-pous/coinduction/pull/22 gets merge *)
 Lemma pfp_gfp {X} {L : CompleteLattice X} (b : mon X): b (gfp b) <= (gfp b).
 Proof. apply b_chain. Qed.
-
-  (* in goal: elem -> b elem -> gfp b -> b gfp *)
-
-Ltac step_ :=
-  match goal with
-  | |- gfp ?b ?x ?y ?z => apply ((gfp_fp b x y z))
-  | |- elem ?R ?x ?y ?z => apply (b_chain R x y z)
-  | |- gfp ?b ?x ?y => apply ((gfp_fp b x y))
-  | |- elem ?R ?x ?y => apply (b_chain R x y)
-  | |- gfp ?b ?x => apply ((gfp_fp b x))
-  | |- elem ?R ?x => apply (b_chain R x)
-  end.
 
 Ltac step := match goal with
     | |- context [gfp ?b] => apply (pfp_gfp b)
