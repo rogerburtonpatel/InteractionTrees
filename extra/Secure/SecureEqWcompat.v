@@ -40,25 +40,6 @@ Qed.
 Ltac inv_vis_secure := ddestruction;
    try contradiction; try contra_size.
 
-Ltac clear_trivial :=
-  repeat match goal with
-  | H : empty ?A, H' : forall a : ?A, ?P |- _ => clear H' end.
-
-Ltac find_size A :=
-  match goal with
-  | H : nonempty A |- _ => idtac
-  | H : empty A |- _ => idtac
-  | |- _ => destruct (classic_empty A); try contra_size end.
-
-Ltac produce_elem H A := inv H; assert (nonempty A); try (constructor; auto with itree; fail).
-
-(* Specialize every [forall _ : (type of x), _] hypothesis with [x]. *)
-Ltac spew x :=
-  let T := type of x in
-  repeat lazymatch goal with
-  | [ H0 : forall (_ : T), _ |- _ ] => specialize (H0 x)
-  end.
-
 Ltac contra_leq :=
   match goal with
   | [ Hleq : leq ?a ?b, Hnleq : ~ leq ?a ?b |- _ ] => contradiction

@@ -302,9 +302,3 @@ Fixpoint burn (n : nat) {E R} (t : itree E R) :=
     | TauF t' => burn n t'
     end
   end.
-
-
-Ltac fold_monad :=
-  repeat (change (@ITree.bind ?E) with (@Monad.bind (itree E) _));
-  repeat (change (go (@RetF ?E _ _ _ ?r)) with (@Monad.ret (itree E) _ _ r));
-  repeat (change (@ITree.map ?E) with (@Functor.fmap (itree E) _)).
