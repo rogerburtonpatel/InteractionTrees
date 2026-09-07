@@ -169,7 +169,7 @@ Proof.
     rewrite <- itree_eta in H1. now rewrite tau_euttge.
 Qed.
 
-(** Helper: inversion of [ruttF] at [TauF] on the left. *)
+(** Helper: inversion of [rutt] at [Tau] on the left. *)
 Lemma rutt_inv_Tau_l t1 t2 :
   rutt REv RAns RR (Tau t1) t2 -> rutt REv RAns RR t1 t2.
 Proof.
@@ -181,7 +181,8 @@ Proof.
   - constructor. auto.
 Qed.
 
-(** Helper: inversion of [ruttF] at [TauF] on the right. *)
+(** Helper: inversion of [rutt] at [Tau] on the right. *)
+
 Lemma rutt_inv_Tau_r t1 t2 :
   rutt REv RAns RR t1 (Tau t2) -> rutt REv RAns RR t1 t2.
 Proof.
@@ -198,6 +199,7 @@ Lemma rutt_add_Tau_l t1 t2 :
 Proof.
   intros. step. constructor. step in H. exact H.
 Qed.
+
 
 Lemma rutt_add_Tau_r t1 t2 :
   rutt REv RAns RR t1 t2 -> rutt REv RAns RR t1 (Tau t2).
