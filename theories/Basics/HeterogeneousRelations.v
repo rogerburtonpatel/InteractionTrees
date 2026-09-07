@@ -804,10 +804,3 @@ Variant sum_postrel  {E1 E2 D1 D2 : Type -> Type} (PR1 : postrel E1 D1 ) (PR2 : 
   | sum_postrel_inl A B e1 d1 a b : PR1 A B e1 a d1 b -> sum_postrel PR1 PR2 A B (inl1 e1) a (inl1 d1) b
   | sum_postrel_inr A B e2 d2 a b : PR2 A B e2 a d2 b -> sum_postrel PR1 PR2 A B (inr1 e2) a (inr1 d2) b
 .
-
-
-Ltac PER_reflexivityH :=
-  match goal with
-  | [ H : ?R  ?X ?Y |- ?R  ?X ?X ] =>  eapply PER_reflexivityH1; eauto
-  | [ H : ?R  ?Y ?X |- ?R  ?X ?X ] =>  eapply PER_reflexivityH2; eauto
-  end; try apply per_symm ; try apply per_trans.
