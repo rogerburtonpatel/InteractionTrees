@@ -225,3 +225,7 @@ Proof.
   cbn[any_infinite_mon body] in H. unfold any_infinite_ in H.
   inversion H.
 Qed.
+
+
+(* Derives contradiction from evidence that a return tree is infinite *)
+Ltac inv_infinite_ret := match goal with [ H : any_infiniteF _ (RetF _) |- _  ] => inversion H end.

@@ -116,3 +116,8 @@ Proof.
   - apply IHn. specialize (itree_eta t) as Ht. rewrite Heq in Ht. rewrite Ht in H.
     rewrite tau_eutt in H. auto.
 Qed.
+
+
+#[local] Tactic Notation "step" := repeat red; step.
+
+#[local] Tactic Notation "step" "in" ident(h) := repeat red in h; step in h.
