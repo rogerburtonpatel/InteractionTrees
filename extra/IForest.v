@@ -188,10 +188,6 @@ Proof. reflexivity. Qed.
 #[local] Hint Rewrite iforest_to_mon_obs : to_mon_obs.
 #[local] Hint Rewrite iforest_to_mon_go  : to_mon_go.
   
-(* step -> inversion; common pattern for eutt Hyps *)
-Ltac sinv H := step in H; inv H. 
-
-
 
 (* Figure 7: Interpreter law for Ret *)
 Lemma interp_iforest_ret :
