@@ -168,7 +168,7 @@ Section LoopInvarSpecific.
       not_wf_from (state_iter_arrow_rel g ) (s,a) -> MonadIter_stateT0 _ _  g a s ≈ ITree.spin.
   Proof.
     intros. unfold MonadIter_stateT0.
-    apply iter_inl_spin. (*seems to require some coinduciton*)
+    apply iter_inl_spin. (*seems to require some coinduction *)
     generalize dependent a. generalize dependent s.
     coinduction c CIH.  
     intros. red in H; sinv H; try apply not_wf_F_mono'. 

@@ -286,7 +286,7 @@ Tactic Notation "refold" "in" ident(h) := refold_in h.
 | |- context[elem _] => idtac 
 | |- _ => 
 repeat red end)
-; Coinduction.tactics.step; icbn; try refold.
+; tactics.step; icbn; try refold.
 
 
 Tactic Notation "step" "in" ident(h) :=
