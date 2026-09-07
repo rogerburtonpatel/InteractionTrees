@@ -167,33 +167,6 @@ Definition interp_iforest {E F} (h_spec : E ~> iforest F) :
   forall R (RR: relation R), itree E R -> iforest F R :=
     fun R (RR: relation R) => gfp (interp_iforest_mon E F h_spec R RR).
 
-
-#[local] Ltac iunfold     := unfold euttge, eq_itree, eutt, eqit, interp_iforest.
-#[local] Ltac iunfold_in h := unfold euttge, eq_itree, eutt, eqit, interp_iforest in h.
-#[local] Ltac iunfold_all := unfold euttge, eq_itree, eutt, eqit, interp_iforest in *.
-
-#[local] Ltac refold :=
-  repeat match goal with
-  | |- context[gfp (@eqit_mon ?E ?b1 ?b2) ?R1 ?R2 ?RR] =>
-      fold (@eqit E R1 R2 RR b1 b2);
-      try fold (@eq_itree E _ _);
-      try fold (@euttge E _ _);
-      try fold (@eutt E _ _)
-  | |- context[gfp (interp_iforest_mon ?E ?F ?h ?R ?RR)] =>
-      fold (@interp_iforest E F h R RR)
-  end.
-
-#[local] Ltac refold_in h :=
-  match type of h with
-  | context[gfp (@eqit_mon ?E ?b1 ?b2) ?R1 ?R2 ?RR] =>
-      fold (@eqit E R1 R2 RR b1 b2) in h;
-      try fold (@eq_itree E _ _) in h;
-      try fold (@euttge E _ _) in h;
-      try fold (@eutt E _ _) in h
-  | context[gfp (interp_iforest_mon ?E ?F ?h ?R ?RR)] =>
-      fold (@interp_iforest E F h R RR) in h
-  end.
-
 #[local] Ltac to_mon_core :=
   match goal with
   | |- context[
@@ -252,57 +225,10 @@ Definition interp_iforest {E F} (h_spec : E ~> iforest F) :
               sim (go (con1 a1)) t1) in h
   end.
 
-#[local] Ltac icbn :=
-  cbn[eqit_mon body eqit_ interp_iforest_mon interp_iforest_];
-  try unfold interp_iforest_. 
-
-#[local] Ltac icbn_in H :=
-  cbn[eqit_mon body eqit_ interp_iforest_mon interp_iforest_] in H;
-  try unfold interp_iforest_ in H.
-
-#[local] Tactic Notation "icbn" "in" ident(h) := icbn_in h.
-#[local] Tactic Notation "icbn" "in" "*" :=
-  cbn[eqit_mon body eqit_ interp_iforest_mon interp_iforest_] in *;
-  try unfold interp_iforest_ in *. 
-
-#[local] Tactic Notation "refold" "in" ident(h) := refold_in h.
-#[local] Tactic Notation "to_mon" "in" ident(h) := to_mon_in h.
-#[local] Tactic Notation "iunfold" "in" ident(h) := iunfold_in h.
-#[local] Tactic Notation "iunfold" "in" "*" := iunfold_all.
-
-
-#[local] Tactic Notation "step" :=
-  iunfold; step; icbn; try refold.
-
-#[local] Tactic Notation "unstep" :=
-  iunfold; try to_mon; unstep; try refold.
-
-#[local] Tactic Notation "step" "in" ident(h) :=
-  iunfold in h; step in h; icbn in h; try refold_in h.
-
-#[local] Tactic Notation "unstep" "in" ident(h) :=
-  iunfold_in h; try to_mon_in h; unstep_in h; try refold_in h.
-
-#[local] Tactic Notation "icoinduction" simple_intropattern(R) simple_intropattern(H) :=
-  iunfold_coind; coinduction R H; icbn.
-
-#[local] Tactic Notation "coinduction" simple_intropattern(R) simple_intropattern(H) :=
-  icoinduction R H;
-  to_mon.
-
-#[local] Tactic Notation "coinduction" :=
-  let c := fresh "c" in
-  let CIH := fresh "CIH" in
-  coinduction c CIH.
-
 #[local] Ltac bcbn :=
   cbn[eqit_mon body eqit_ interp_iforest_mon interp_iforest_];
   cbn; 
-  to_mon.
-  
-(* step -> inversion; common pattern for eutt Hyps *)
-Ltac sinv H := step in H; inv H. 
-
+  to_mon. 
 
 
 (* Figure 7: Interpreter law for Ret *)
