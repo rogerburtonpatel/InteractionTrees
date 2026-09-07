@@ -131,7 +131,7 @@ Lemma pi_secure_eqit_mono : forall E (b1 b2 b3 b4 : bool) R1 R2 RR1 RR2 Label pr
     pi_eqit_secure Label priv RR1 b1 b2 l t1 t2 -> pi_eqit_secure Label priv RR2 b3 b4 l t1 t2.
 Proof.
   intros. generalize dependent t2. revert t1. coinduction c CIH.
-  intros t1 t2 Ht12. icbn.
+  intros t1 t2 Ht12. down.
   step in Ht12.
   hinduction Ht12 before l; intros;
   try (unpriv_pi; apply CIH; try red; eauto; fail);
@@ -162,7 +162,7 @@ Lemma pi_eqit_secure_mixed_trans_aux1:
 Proof.
   intros E R1 b2 R2 RR1 Label priv l. coinduction c CIH.
   intros t1 t2 Htau. step in Htau.
-  icbn. cbn in *.
+  down. cbn in *.
   inv Htau; eauto 4 with itree.
   - constructor; auto. apply (gfp_chain c). apply H1.
   - constructor; auto. apply CIH. step. rewrite <- H0. step in H1. apply H1.
@@ -177,7 +177,7 @@ Lemma pi_eqit_secure_mixed_trans b1 b2 E R1 R2 R3 (RR1 : R1 -> R2 -> Prop) (RR2 
     pi_eqit_secure Label priv (rcompose RR1 RR2) b1 b2 l t1 t3.
 Proof.
   coinduction c CIH. intros t1 t2 t3 Hsec Heq.
-  step in Heq. step in Hsec. icbn. cbn in *.
+  step in Heq. step in Hsec. down. cbn in *.
   hinduction Heq before c; intros.
   - inv Hsec; eauto 4 with itree; unpriv_pi.
     + rewrite itree_eta'. constructor; auto with itree. eapply CIH; eauto. step. rewrite H0. constructor. auto.
@@ -236,7 +236,7 @@ Proof with eauto with itree.
    unfold Proper, respectful, flip, impl.
   tower induction.
   clear c; intros c IH x x' EQx y y' EQy; step in EQx; step in EQy.
-    intros EQ. icbn; icbn in EQ. 
+    intros EQ. down; down in EQ. 
     genobs x' ox'; genobs y' oy'.
     (* [hinduction] is not sufficient here, because [move] is unable to pass
          through [ox] to reach [x] *)
@@ -340,7 +340,7 @@ Qed.  *)
   Proper (eq_itree (E := E) eq ==> eq_itree eq ==> flip impl) (elem c).
 Proof.
   tower induction. unfold Proper, respectful, Basics.flip, Basics.impl. intros CIH t1 t2 H12 t3 t4 H34 Hpi.
-  icbn; icbn in Hpi. step in H12; step in H34. 
+  down; down in Hpi. step in H12; step in H34. 
   induction Hpi; inv_eq_itree.
   (* ret and coinductive cases are simple *)
   1,2: eauto 4 with itree. 
@@ -398,7 +398,7 @@ Proof.
                                       solve [now step; apply_foralls].
   intros t1 t2 c. revert t1 t2. tower induction.
   intros CIH t1 t2 Hk1k2 Ht1t2.
-  step in Ht1t2. genobs t1 ot1. genobs t2 ot2; icbn. 
+  step in Ht1t2. genobs t1 ot1. genobs t2 ot2; down. 
   hinduction Ht1t2 before c; intros. 
   - rewrite 2 observe_bind. simpobs. now apply Hk1k2.
   - rewrite 2 observe_bind. simpobs. etau. 
@@ -446,7 +446,7 @@ Lemma pi_eqit_secure_iter_bind_aux:
 Proof.
   intros E B2 B1 A1 A2 RA RB b1 b2 Label priv l body1 body2 c. 
   tower induction. intros CIH Hbody t1 t2 Ht12. step in Ht12. 
-  icbn. genobs t1 ot1. genobs t2 ot2.
+  down. genobs t1 ot1. genobs t2 ot2.
   hinduction Ht12 before E; intros. 
   #[local] Ltac break_observe := unfold observe; cbn; simpobs; cbn. 
   (* QUESTION: why does 'now step; apply Hbody' instead of auto fail? *)

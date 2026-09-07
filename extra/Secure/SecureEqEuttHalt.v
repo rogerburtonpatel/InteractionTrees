@@ -32,7 +32,7 @@ Local Open Scope monad_scope.
   all: revert x y EQx x' y' EQy. 
   all: tower induction; 
        intros IH x x' EQx y y' EQy EQ; step in EQx; step in EQy.
-  all: icbn; icbn in EQ; cbn in *. 
+  all: down; down in EQ; cbn in *. 
   1: genobs x ox; genobs y oy; 
     revert x x' y y' Heqox Heqoy EQx EQy.
   2: genobs x' ox'; genobs y' oy'; 
@@ -238,7 +238,7 @@ Definition classic_empty := Secure.Labels.classic_empty.
 Proof.
   tower induction. unfold Proper, respectful, Basics.flip, Basics.impl; subst. 
   clear c. intros c. intros CIH t1 t1' Heutt t2 _ <- Hsec. 
-  step in Heutt. icbn; icbn in Hsec.  
+  step in Heutt. down; down in Hsec.  
   hinduction Heutt before E; intros; subst; auto with itree.
   (* - remember (RetF r2) as x. hinduction Hsec before E; intros; try inv_e Heqx; auto with itree.
     + constructor; auto. eapply IHHsec; eauto.
@@ -990,7 +990,7 @@ Lemma eqit_itree_eqit_secure : forall E Label priv l R1 R2 RR (t1 t1': itree E R
     eqit_secure Label priv RR false false l t1' t2.
 Proof.
   intros E Label priv l R1 R2 RR. coinduction c CIH.
-  intros t1 t1' t2 Heq Hsec. icbn. 
+  intros t1 t1' t2 Heq Hsec. down. 
   step in Heq. step in Hsec. 
   inv_e Heq.
   - rewrite <- H0 in Hsec. rewrite itree_eta' at 1. 
@@ -1095,7 +1095,7 @@ Qed.
     secure_eqit_mon Label priv RR true true l (elem c) (Tau t1) t2 -> secure_eqit_mon Label priv RR true true l (elem c) t1 t2.
 Proof.
   intros E R1 R2 Label priv l RR.  intros t1 t2 c Hsec.
-  icbn; icbn in Hsec; cbn in *. remember (TauF t1) as x.
+  down; down in Hsec; cbn in *. remember (TauF t1) as x.
   hinduction Hsec before priv; intros; inversion Heqx; subst; eauto 4 with itree.
   - constructor; auto. now unstep. 
   - unpriv_ind. now unstep. 
@@ -1110,7 +1110,7 @@ Qed. *)
 Proof.
   tower induction. unfold Proper, respectful, Basics.flip, Basics.impl; subst. 
   clear c. intros c. intros CIH t1 t1' Heutt t2 _ <- Hsec. 
-  step in Heutt. icbn; icbn in Hsec.  
+  step in Heutt. down; down in Hsec.  
   hinduction Heutt before E; intros; subst; auto with itree.
   (* - remember (RetF r2) as x. hinduction Hsec before E; intros; try inv_e Heqx; auto with itree.
     + constructor; auto. eapply IHHsec; eauto.

@@ -100,7 +100,7 @@ Proof. reflexivity. Qed.
 Lemma rutt_flip {E1 E2 R1 R2 REv RAns RR} (t1: itree E1 R1) (t2: itree E2 R2):
   rutt REv RAns RR t1 t2 <-> rutt (flip_REv REv) (flip_RAns RAns) (flip RR) t2 t1.
 Proof.
-  split; revert t1 t2; coinduction c CIH; icbn; intros t1 t2 Hrutt; 
+  split; revert t1 t2; coinduction c CIH; down; intros t1 t2 Hrutt; 
   step in Hrutt.
   - induction Hrutt; try now constructor.
     * apply EqTau. now apply CIH.
@@ -125,7 +125,7 @@ Proof.
   intros REv1 REv2 HREv  RAns1 RAns2 HRAns RR1 RR2 HRR t1 _ <- t2 _ <-.
   split; intros Hrutt; 
     revert t1 t2 Hrutt; coinduction c CIH; intros t1 t2 Hrutt; 
-    step in Hrutt; rcbn; 
+    step in Hrutt; down; 
     hinduction Hrutt before CIH; intros; eauto using EqTauL, EqTauR.
     1,4: apply EqRet; now apply HRR. 
     1,3: apply EqTau; now apply CIH.
@@ -145,7 +145,7 @@ Qed.
 Proof.
   split; revert_until c; tower induction;
   intros IH t1 t1' Ht1 t2 t2' Ht2;
-  step in Ht1; step in Ht2; rcbn; intros Hrutt;
+  step in Ht1; step in Ht2; down; intros Hrutt;
   genobs t1' ot1'; genobs t2' ot2';
   move Hrutt before IH; revert_until Hrutt;
   induction Hrutt; intros; subst.
@@ -195,7 +195,7 @@ Proof.
   unfold Proper, respectful, flip, impl.
   tower induction.
   intros IH x x' EQx y y' EQy; step in EQx; step in EQy.
-  rcbn; intros EQ.
+  intros EQ. down. down in EQ. 
   genobs x' ox'; genobs y' oy'.
   revert x x' y y' Heqox' Heqoy' EQx EQy.
   induction EQ; intros.
@@ -218,7 +218,7 @@ Proof.
     + intros [=<-] ? ?.
       genobs y oy. gentau m2 om2. revert y Heqoy.
       hinduction EQy before oy; try discriminate.
-      * intros [=<-] ? ?. to_mon_core. intros ? ?. rcbn. constructor. eapply IH; eauto.
+      * intros [=<-] ? ?. to_mon_core. intros ? ?. down. constructor. eapply IH; eauto.
       * intros. apply EqTauR; auto. eapply IHEQy; eauto.
     + intros; subst. apply EqTauL; auto. eapply IHEQx; eauto.
 
@@ -267,7 +267,7 @@ Lemma rutt_cong_eutt {E1 E2 R1 R2}:
   rutt REv RAns RR t1' t2.
 Proof.
   intros * Hrutt Heutt; revert t1 t1' Heutt t2 Hrutt.
-  coinduction c CIH; icbn; intros t1 t1' Heutt t2 Hrutt.
+  coinduction c CIH; down; intros t1 t1' Heutt t2 Hrutt.
   step in Hrutt.
   rewrite (itree_eta t1') in Heutt.
   remember (observe t1) as ot1 eqn:Hot1.
@@ -285,7 +285,7 @@ Proof.
     step in Heutt'. cbn in Heutt'.
     rewrite <- Hot1' in Heutt'. clear tt1 Hot1'.
     clear tt2 Hot2'.
-    step in H. rcbn in H.
+    step in H. down in H.
     remember (TauF m1) as oTauL eqn:HoTauL.
     revert m1 m2 H HoTauL.
     induction Heutt' as [r1 r2 _|m1' m1''|U' e1 k1 k1' _|t1' ot1' _ IHHeutt'|t1'' m1''];
@@ -390,7 +390,7 @@ Lemma rutt_bind {E1 E2 R1 R2 T1 T2}
       rutt REv RAns RT (k1 r1) (k2 r2)) ->
     rutt REv RAns RT (ITree.bind t1 k1) (ITree.bind t2 k2).
 Proof.
-  revert t1 t2. coinduction c CIH. icbn. intros t1 t2 Hrutt EQK.
+  revert t1 t2. coinduction c CIH. down. intros t1 t2 Hrutt EQK.
   step in Hrutt.
   genobs t1 ot1. genobs t2 ot2.
   hinduction Hrutt before CIH; intros.
@@ -427,7 +427,7 @@ Section RuttMrec.
       rutt (sum_prerel RPreInv RPre) (sum_postrel RPostInv RPost) RR t1 t2 ->
       rutt RPre RPost RR (interp_mrec bodies1 t1) (interp_mrec bodies2 t2).
   Proof.
-    coinduction c CIH. icbn. 
+    coinduction c CIH. down. 
     intros t1 t2 Ht12. step in Ht12. 
     remember (observe t1) as ot1. remember (observe t2) as ot2.
     hinduction Ht12 before R1; intros; to_mon. 

@@ -229,8 +229,8 @@ Arguments eqit_mon {E} b1 b2.
 (* Unfolding tactics for bisimulations. *)
 (* Generally, these are used to go from [eqit_mon] to [eqitF]. *)
 (* Sometimes you will call these manually. *)
-Ltac icbn := repeat red. 
-Ltac icbn_in h := repeat red in h.
+Ltac down := repeat red. 
+Ltac down_in h := repeat red in h.
 
 (* Used to refold eqit; useful for automation: 
    sometimes [auto] will not recognize that [eqit] should solve
@@ -276,8 +276,8 @@ Proof. reflexivity. Qed.
 #[global] Hint Rewrite @eqit_to_mon_obs : to_mon_obs.
 #[global] Hint Rewrite @eqit_to_mon_go  : to_mon_go.
 
-Tactic Notation "icbn" "in" ident(h) := icbn_in h.
-#[local] Tactic Notation "icbn" "in" "*" := cbn [eqit_mon body eqit_] in *.
+Tactic Notation "down" "in" ident(h) := down_in h.
+#[local] Tactic Notation "down" "in" "*" := cbn [eqit_mon body eqit_] in *.
 
 Tactic Notation "refold" "in" ident(h) := refold_in h.
 
@@ -286,7 +286,7 @@ Tactic Notation "refold" "in" ident(h) := refold_in h.
 | |- context[elem _] => idtac 
 | |- _ => 
 repeat red end)
-; tactics.step; icbn; try refold.
+; tactics.step; down; try refold.
 
 
 Tactic Notation "step" "in" ident(h) :=
@@ -300,16 +300,12 @@ Tactic Notation "unstep" := unfold euttge, eq_itree, eutt, eqit; try to_mon; uns
 Tactic Notation "unstep" "in" ident(h) :=
   unfold euttge, eq_itree, eutt, eqit in h; try to_mon_in h; unstep_in h; try refold_in h.
 
-
-Tactic Notation "coinduction" ident(c) simple_intropattern(CIH) :=
-  coinduction c CIH.
-
 Tactic Notation "coinduction" :=
   let c := fresh "c" in let CIH := fresh "CIH" in coinduction c CIH.
 
 Tactic Notation "icoinduction"
     simple_intropattern(R) simple_intropattern(H) :=
-    coinduction R H; icbn.
+    coinduction R H; down.
 
 
 
@@ -753,7 +749,7 @@ Proof with eauto with itree.
   unfold Proper, respectful, flip, impl.
   tower induction.
   intros IH x x' EQx y y' EQy; step in EQx; step in EQy.
-    intros EQ. icbn in *. 
+    intros EQ. down in *. 
     genobs x' ox'; genobs y' oy'.
     (* [hinduction] is not sufficient here, because [move] is unable to pass
          through [ox] to reach [x] *)
@@ -879,7 +875,7 @@ Proof with eauto with itree.
   split; intros; 
   revert_until RR; 
   icoinduction c CIH; intros; 
-  step in H0; step in H1; step in H; icbn in *.
+  step in H0; step in H1; step in H; down in *.
   all:
   hinduction H1 before RR; intros.
    (* ret and taus cases *)
@@ -944,7 +940,7 @@ Proof with eauto with itree.
   unfold Proper, respectful, flip, impl.
   tower induction.
   intros IH x x' EQx y y' EQy; step in EQx; step in EQy.
-    intros EQ. icbn in *. 
+    intros EQ. down in *. 
     genobs x' ox'; genobs y' oy'.
     revert x x' y y' Heqox' Heqoy' EQx EQy.
     induction EQ; intros.
@@ -1017,7 +1013,7 @@ Qed.
   Proper (eq_itree (E := E) eq ==> eq_itree eq ==> iff) (elem c _ _ RR).
 Proof. 
   split; revert_until c; tower induction; intros!;
-  step in H0; step in H1; icbn in *.
+  step in H0; step in H1; down in *.
   (* this proof is largely uninteresting and is just diagram chase. *)
   all: 
   inv H2; simpobs.
@@ -1143,7 +1139,7 @@ Qed.
 Proof.
   tower induction.
   intros Htrans.
-  intros!. icbn in *. eapply Transitive_eqitF; eauto.
+  intros!. down in *. eapply Transitive_eqitF; eauto.
 Qed.
 
 #[global] Instance Equivalence_elem {E R RR} (HT : Equivalence RR)
@@ -1724,7 +1720,7 @@ Proof.
   revert_until U2. 
   tower induction.
  - intros. 
-  icbn in *. 
+  down in *. 
   genobs t1 ot1.  
   genobs t2 ot2.
   hinduction H0 before RR; intros; try discriminate. 
@@ -2137,9 +2133,9 @@ Proof.
     + inv Heqtl. specialize (IHeqitF _ _ eq_refl _ _ _ eq_refl eq_refl).
       destruct IHeqitF as [(k0 & ? & ?) | (a & ? & ?)]; [left | right].
       * exists k0. split; auto.
-        step; icbn; rewrite Ema; constructor; now step in H0. 
+        step; down; rewrite Ema; constructor; now step in H0. 
       * exists a. split; auto.
-        step; icbn; rewrite Ema; constructor; now step in H0.
+        step; down; rewrite Ema; constructor; now step in H0.
 Qed.
 
 Lemma eutt_inv_bind_vis:
@@ -2178,23 +2174,23 @@ Proof.
   - inv Heqtr. unfold observe, _observe in Heqtl; cbn in Heqtl.
     destruct (observe ma) eqn:Ema; try discriminate.
     + right; exists r; split.
-      * step; icbn; rewrite Ema; constructor; auto.
-      * step; icbn; inv H0; unfold observe, _observe; rewrite <- Heqtl; now constructor.
+      * step; down; rewrite Ema; constructor; auto.
+      * step; down; inv H0; unfold observe, _observe; rewrite <- Heqtl; now constructor.
     + left; exists t; split.
-      * step; icbn; rewrite Ema; constructor; apply reflexivity.
+      * step; down; rewrite Ema; constructor; apply reflexivity.
       * inv Heqtl. inv H0. assumption.  
   - subst.
     unfold observe, _observe in Heqtl; cbn in Heqtl.
     destruct (observe ma) eqn:Ema; try discriminate.
     + right; exists r; split.
-      * step; icbn; rewrite Ema; constructor; auto.
-      * step; icbn; unfold observe at 1; unfold _observe; rewrite <- Heqtl. constructor 4; auto.
+      * step; down; rewrite Ema; constructor; auto.
+      * step; down; unfold observe at 1; unfold _observe; rewrite <- Heqtl. constructor 4; auto.
     + inv Heqtl. specialize (IHeqitF _ _ eq_refl _ _ eq_refl eq_refl).
       destruct IHeqitF as [(t0 & ? & ?) | (a & ? & ?)]; [left | right].
       * exists t0. split; auto.
-        step; icbn; rewrite Ema; constructor 4; now step in H0.
+        step; down; rewrite Ema; constructor 4; now step in H0.
       * exists a. split; auto.
-        step; icbn; rewrite Ema; constructor; now step in H0.
+        step; down; rewrite Ema; constructor; now step in H0.
   - inv Heqtr.
     left; exists ma; split.
     + step; constructor; auto. 
@@ -2504,7 +2500,6 @@ Qed.
 Proof. 
   intros!; now eapply observing_eq_chain.
 Qed. 
-
 
 Ltac auto_ctrans :=
   intros; repeat (match goal with [H: rcompose _ _ _ _ |- _] => destruct H end); subst; eauto.

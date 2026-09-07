@@ -109,14 +109,8 @@ End RuttF.
 
 (** ** Rutt-specific tactics *)
 
-Ltac rcbn := cbn[rutt_mon body]; try unfold rutt_.
-Ltac rcbn_in H := cbn[rutt_mon body] in H; try unfold rutt_ in H.
 
-Tactic Notation "rcbn" "in" ident(h) := rcbn_in h.
-
-(** [rstep] unfolds [rutt] one step, exposing the [ruttF] functor. *)
-Tactic Notation "rstep" := step; rcbn.
-Tactic Notation "rstep" "in" ident(h) := step in h; rcbn in h.
+(** [step] unfolds [rutt] one step, exposing the [ruttF] functor. *)
 
 Lemma rutt_to_mon_obs {E1 E2 R1 R2} REv RAns f (RR : R1 -> R2 -> Prop) t1 t2 :
   @ruttF E1 E2 R1 R2 REv RAns RR (f RR) (observe t1) (observe t2)
@@ -145,18 +139,18 @@ Variable (RR: R1 -> R2 -> Prop).
 Lemma rutt_Ret r1 r2:
   RR r1 r2 ->
   @rutt E1 E2 R1 R2 REv RAns RR (Ret r1: itree E1 R1) (Ret r2: itree E2 R2).
-Proof. intros. rstep. constructor; auto. Qed.
+Proof. intros. step. constructor; auto. Qed.
 
 Lemma rutt_inv_Ret r1 r2:
   rutt REv RAns RR (Ret r1) (Ret r2) -> RR r1 r2.
 Proof.
-  intros. rstep in H. inv H. assumption. 
+  intros. step in H. inv H. assumption. 
 Qed.
 
 Lemma rutt_inv_Ret_l r1 t2:
   rutt REv RAns RR (Ret r1) t2 -> exists r2, t2 ≳ Ret r2 /\ RR r1 r2.
 Proof.
-  intros Hrutt. rstep in Hrutt. rcbn in Hrutt. 
+  intros Hrutt. step in Hrutt.
   setoid_rewrite (itree_eta t2). remember (observe (Ret r1)) as ot1; revert Heqot1.  
   induction Hrutt; intros; try discriminate.
   - inversion Heqot1; subst. exists r2. split; [reflexivity|auto].
@@ -167,7 +161,7 @@ Qed.
 Lemma rutt_inv_Ret_r t1 r2:
   rutt REv RAns RR t1 (Ret r2) -> exists r1, t1 ≳ Ret r1 /\ RR r1 r2.
 Proof.
-  intros Hrutt. rstep in Hrutt. rcbn in Hrutt.
+  intros Hrutt. step in Hrutt.
   setoid_rewrite (itree_eta t1). remember (observe (Ret r2)) as ot2; revert Heqot2.
   induction Hrutt; intros; try discriminate.
   - inversion Heqot2; subst. exists r1. split; [reflexivity|auto].
@@ -182,7 +176,7 @@ Lemma ruttF_inv_tau_l t1 ot2 :
 Proof.
   intros H. remember (TauF t1) as tt1.
   induction H; try discriminate.
-  - inv Heqtt1. constructor. rstep in H. exact H.
+  - inv Heqtt1. constructor. step in H. exact H.
   - inv Heqtt1. assumption. 
   - constructor. auto.
 Qed.
@@ -194,7 +188,7 @@ Lemma ruttF_inv_tau_r ot1 t2 :
 Proof.
   intros H. remember (TauF t2) as tt2.
   induction H; try discriminate.
-  - inv Heqtt2. constructor. rstep in H. exact H.
+  - inv Heqtt2. constructor. step in H. exact H.
   - constructor. auto.
   - inv Heqtt2. assumption. 
 Qed.
@@ -202,27 +196,27 @@ Qed.
 Lemma rutt_inv_Tau_l t1 t2 :
   rutt REv RAns RR (Tau t1) t2 -> rutt REv RAns RR t1 t2.
 Proof.
-  intros. rstep in H. rstep.
+  intros. step in H. step.
   apply ruttF_inv_tau_l. exact H.
 Qed.
 
 Lemma rutt_add_Tau_l t1 t2 :
   rutt REv RAns RR t1 t2 -> rutt REv RAns RR (Tau t1) t2.
 Proof.
-  intros. rstep. constructor. rstep in H. exact H.
+  intros. step. constructor. step in H. exact H.
 Qed.
 
 Lemma rutt_inv_Tau_r t1 t2 :
   rutt REv RAns RR t1 (Tau t2) -> rutt REv RAns RR t1 t2.
 Proof.
-  intros. rstep in H. rstep.
+  intros. step in H. step.
   apply ruttF_inv_tau_r. exact H.
 Qed.
 
 Lemma rutt_add_Tau_r t1 t2 :
   rutt REv RAns RR t1 t2 -> rutt REv RAns RR t1 (Tau t2).
 Proof.
-  intros. rstep. constructor. rstep in H. exact H.
+  intros. step. constructor. step in H. exact H.
 Qed.
 
 Lemma rutt_inv_Tau t1 t2 :
@@ -237,7 +231,7 @@ Lemma rutt_Vis {T1 T2} (e1: E1 T1) (e2: E2 T2)
   (forall t1 t2, RAns _ _ e1 t1 e2 t2 -> rutt REv RAns RR (k1 t1) (k2 t2)) ->
   rutt REv RAns RR (Vis e1 k1) (Vis e2 k2).
 Proof.
-  intros He Hk. rstep. constructor; auto.
+  intros He Hk. step. constructor; auto.
 Qed.
 
 Lemma rutt_inv_Vis_l {U1} (e1: E1 U1) k1 t2:
@@ -247,7 +241,7 @@ Lemma rutt_inv_Vis_l {U1} (e1: E1 U1) k1 t2:
     REv _ _ e1 e2 /\
     (forall v1 v2, RAns _ _ e1 v1 e2 v2 -> rutt REv RAns RR (k1 v1) (k2 v2)).
 Proof.
-  intros Hrutt. rstep in Hrutt. rcbn in Hrutt.
+  intros Hrutt. step in Hrutt.
   setoid_rewrite (itree_eta t2). remember (observe (Vis e1 k1)) as ot1; revert Heqot1.
   induction Hrutt; intros; try discriminate; subst.
   - inversion Heqot1; subst A. inversion_sigma; rewrite <- eq_rect_eq in *;
@@ -265,7 +259,7 @@ Lemma rutt_inv_Vis_r {U2} t1 (e2: E2 U2) k2:
     REv U1 U2 e1 e2 /\
     (forall v1 v2, RAns _ _ e1 v1 e2 v2 -> rutt REv RAns RR (k1 v1) (k2 v2)).
 Proof.
-  intros Hrutt. rstep in Hrutt. rcbn in Hrutt.
+  intros Hrutt. step in Hrutt.
   setoid_rewrite (itree_eta t1). remember (observe (Vis e2 k2)) as ot2; revert Heqot2.
   induction Hrutt; intros; try discriminate; subst.
   - inversion Heqot2; subst B. inversion_sigma; rewrite <- eq_rect_eq in *;
@@ -281,7 +275,7 @@ Lemma rutt_inv_Vis U1 U2 (e1: E1 U1) (e2: E2 U2)
   rutt REv RAns RR (Vis e1 k1) (Vis e2 k2) ->
   forall u1 u2, RAns U1 U2 e1 u1 e2 u2 -> rutt REv RAns RR (k1 u1) (k2 u2).
 Proof.
-  intros H u1 u2 Hans. rstep in H.
+  intros H u1 u2 Hans. step in H.
   exact (ruttF_inv_VisF _ _ _ _ _ _ _ _ _ H u1 u2 Hans).
 Qed.
 

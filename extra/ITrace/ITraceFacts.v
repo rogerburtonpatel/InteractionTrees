@@ -24,10 +24,6 @@ Import Monads.
 Import MonadNotation.
 Local Open Scope monad_scope.
 
-Tactic Notation "step" := repeat red; step. 
-Tactic Notation "step" "in" ident(h) := repeat red in h; step in h. 
-Tactic Notation "sinv" ident(h) := step in h; inv h. 
-
 Lemma classic_empty : forall (A : Type), ( exists e : A + (A -> void), True ).
 Proof.
   intros. destruct (classic (exists a : A, True)).

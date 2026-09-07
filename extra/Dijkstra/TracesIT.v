@@ -338,7 +338,7 @@ Proof.
     basic_solve. destruct a.
     + rewrite bind_ret_l in H0. cbn in H0. rewrite tau_eutt in H0.
       step in H. clear Hb.
-      icbn.  
+      down.  
       dependent induction H; simpobs. 
       * constructor; auto with itree. intros.
         destruct a. eapply CIH.

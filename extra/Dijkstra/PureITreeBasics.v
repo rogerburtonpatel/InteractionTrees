@@ -62,7 +62,7 @@ Qed.
 Lemma eutt_reta_or_div_aux : forall A (t : itree void1 A), ~(exists a, ret a ≈ t) -> any_infinite t.
 Proof.
   intro A. unfold any_infinite, any_infinite_. 
-  coinduction c CIH. 
+  coinduction.
   intros. destruct (observe t) eqn : Heqt.
   - exfalso. specialize (itree_eta t) as Heta. rewrite Heqt in Heta. apply H.
     exists r. rewrite Heta. reflexivity.
@@ -116,8 +116,3 @@ Proof.
   - apply IHn. specialize (itree_eta t) as Ht. rewrite Heq in Ht. rewrite Ht in H.
     rewrite tau_eutt in H. auto.
 Qed.
-
-
-#[local] Tactic Notation "step" := repeat red; step.
-
-#[local] Tactic Notation "step" "in" ident(h) := repeat red in h; step in h.

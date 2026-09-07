@@ -263,12 +263,11 @@ step on gfp can reduce.
 
 
 
-#[local] Tactic Notation "icbn" := repeat red; cbn.  
 
   Instance proper_bisim_inf_imp {A} : Proper (@bisim A ==> Basics.impl) is_inf.
   Proof.
     coinduction c CIH.
-    intros s1 s2 H12 H. icbn. step in H. 
+    intros s1 s2 H12 H. down. step in H. 
     step in H12. inv H12. 
     - rewrite <- H1 in H. inv H.
     - inversion H; subst. 
@@ -284,7 +283,7 @@ step on gfp can reduce.
 
   Lemma app_inf : forall (A : Type) (s1 s2 : stream A), is_inf s1 -> bisim (app s1 s2) s1.
   Proof.
-    intros A. coinduction c CIH. intros s1 s2 Hinf. icbn. unfold app.
+    intros A. coinduction c CIH. intros s1 s2 Hinf. down. unfold app.
     sinv Hinf.
     cbn. constructor. apply CIH; auto.
   Qed.
@@ -326,7 +325,7 @@ step on gfp can reduce.
       inf_many P s -> is_inf s.
   Proof.
     intros A P. coinduction c CIH. intros s Him.
-    step in Him. icbn. 
+    step in Him. down. 
     induction Him; auto with itree.
     constructor. apply CIH. now step. 
   Qed.
@@ -335,7 +334,7 @@ step on gfp can reduce.
       is_inf s -> forall_stream P s -> inf_many P s.
   Proof.
     intros A P. coinduction c CIH. intros s Hinf Hforall.
-    icbn. step in Hinf. step in Hforall.
+    down. step in Hinf. step in Hforall.
     inv Hinf.
     inv Hforall.
     - rewrite <- H in H2. discriminate.
@@ -400,7 +399,7 @@ step on gfp can reduce.
   Proof.
     coinduction c CIH.
     intros t1 t2 Heutt Hev.
-    step in Heutt. icbn.
+    step in Heutt. down.
     assert (Hev' := Hev). step in Hev.
     dependent induction Heutt; subst; auto with itree.
     - simpobs. auto with itree.
@@ -425,7 +424,7 @@ step on gfp can reduce.
       eventless t1 -> eutt RR t1 t2 -> eqitE RR t1 t2.
   Proof.
     intros E1 R1 R2 RR. coinduction c CIH. intros.
-    step in H0. icbn. dependent induction H0; auto.
+    step in H0. down. dependent induction H0; auto.
     - simpobs. eret. 
     - simpobs.
       constructor.  
@@ -452,10 +451,9 @@ step on gfp can reduce.
       sinv H.
     - specialize (itree_eta t) as Ht. simpobs. 
       rewrite Ht in H0. sinv H0.
-    - icbn. simpobs. 
-      red in H0. step in H0; simpobs; inv H0. 
-      constructor.
-      apply CIH; auto. 
+    - down. simpobs. 
+      red in H0. step in H0; simpobs; inv H0.
+      cbn. etau. 
   Qed.
 
   Lemma eventless_ret : forall (R : Type) (t : itree E R) (r : R),
@@ -471,7 +469,7 @@ step on gfp can reduce.
       eqitE RR t1 t2 -> eutt RR t1 t2.
   Proof.
     intros E1 R1 R2 RR. coinduction c CIH.
-    intros t1 t2 Heq. icbn. step in Heq. 
+    intros t1 t2 Heq. down. step in Heq. 
     induction Heq; auto with itree.
   Qed.
 
@@ -482,7 +480,7 @@ step on gfp can reduce.
   Proof.
     intros E1 E2 R1 R2 RR. coinduction c CIH.
     intros. step in H. 
-    icbn. induction H; eauto with itree.
+    down. induction H; eauto with itree.
     constructor. apply (CIH t0 (ITreeDefinition.go ot2)). now step. 
   Qed.
 
@@ -493,14 +491,14 @@ step on gfp can reduce.
   Proof.
     intros E1 E2 R1 R2 RR. coinduction c CIH.
     intros. step in H.
-    icbn. induction H; eauto with itree.
+    down. induction H; eauto with itree.
     constructor. apply (CIH (ITreeDefinition.go ot1) t0). now step. 
   Qed.
 
   Lemma eventless_spin : forall (E1 : Type -> Type) (R : Type),
       eventless (@ITree.spin E1 R).
   Proof.
-    intros E1 R. coinduction c CIH. icbn. cbn. constructor.
+    intros E1 R. coinduction c CIH. down. cbn. constructor.
     auto.
   Qed.
 
@@ -519,7 +517,7 @@ step on gfp can reduce.
       eventless t -> @equivE E1 E2 A t (remove_events t).
   Proof.
     intros E1 E2 A. coinduction c CIH. intros.
-    icbn. sinv H.
+    down. sinv H.
     - cbn. unfold remove_events. rewrite <- H1. cbn. auto with itree.
     - unfold remove_events. rewrite <- H0. cbn. constructor. apply CIH.
       auto.
@@ -530,7 +528,7 @@ step on gfp can reduce.
       eventless (@remove_events E1 E2 A t).
   Proof.
     intros E1 E2 A. coinduction c CIH. intros.
-    icbn. unfold remove_events. destruct (observe t) eqn : Heq.
+    down. unfold remove_events. destruct (observe t) eqn : Heq.
     - cbn. constructor.
     - cbn. constructor. apply CIH.
     - cbn. constructor. do 2 step. apply eventless_spin. 
@@ -540,7 +538,7 @@ step on gfp can reduce.
       eventless d.
   Proof.
     intros A. coinduction c CIH. intros.
-    icbn. destruct (observe d); auto with itree.
+    down. destruct (observe d); auto with itree.
     destruct e.
   Qed.
 
@@ -550,7 +548,7 @@ step on gfp can reduce.
   Proof.
     intros E1 E2 R1 R2 RR.
 
-    coinduction c CIH. intros. icbn. 
+    coinduction c CIH. intros. down. 
     intros.
     step in H. 
     remember (TauF t1) as ot1. 
@@ -575,7 +573,7 @@ step on gfp can reduce.
       equivE t1 t2.
   Proof.
     intros E1 E2 R. coinduction c CIH.
-    intros t1 t2 Hev1 Hev2 Heutt. icbn.
+    intros t1 t2 Hev1 Hev2 Heutt. down.
     step in Heutt. dependent induction Heutt; subst.
     - unfold remove_events in x0, x.
       destruct (observe t1); destruct (observe t2); try discriminate.
@@ -631,7 +629,7 @@ step on gfp can reduce.
       eqitE RR t1 t2 -> eqitE RR (@remove_events E1 E3 R1 t1) (@remove_events E2 E4 R2 t2).
   Proof.
     intros E1 E2 E3 E4 R1 R2 RR. coinduction c CIH. intros.
-    step in H. icbn. unfold remove_events.
+    step in H. down. unfold remove_events.
     induction H; cbn; auto with itree.
     constructor. apply CIH; auto.
   Qed.
@@ -664,7 +662,7 @@ step on gfp can reduce.
       equivE t1 t2 -> equivE t2 t1.
   Proof.
     intros E1 E2 R. coinduction c CIH. intros.
-    step in H. icbn. 
+    step in H. down. 
     induction H; eauto with itree.
   Qed.
 

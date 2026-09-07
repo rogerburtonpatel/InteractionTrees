@@ -207,7 +207,7 @@ Proof.
   unfold Proper, respectful, flip, impl.
   tower induction.
   intros CIH t1 t2 Ht1t2 t3 t4 Ht3t4 Hbt2t4.
-  icbn; icbn in Hbt2t4.
+  down; down in Hbt2t4.
   step in Ht1t2; step in Ht3t4.
   revert t1 t3 Ht1t2 Ht3t4. induction Hbt2t4; intros.
   - (* secEqRet *)

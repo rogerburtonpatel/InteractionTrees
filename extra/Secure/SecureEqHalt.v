@@ -184,7 +184,7 @@ Lemma secure_eqit_mono : forall E (b1 b2 b3 b4 : bool) R1 R2 RR1 RR2 Label priv 
     eqit_secure Label priv RR1 b1 b2 l t1 t2 -> eqit_secure Label priv RR2 b3 b4 l t1 t2.
 Proof.
   intros. generalize dependent t2. revert t1. coinduction c CIH.
-  intros t1 t2 Ht12. icbn. 
+  intros t1 t2 Ht12. down. 
   step in Ht12.
   hinduction Ht12 before l; intros; 
   try (unpriv_co; apply CIH; try red; eauto; fail);

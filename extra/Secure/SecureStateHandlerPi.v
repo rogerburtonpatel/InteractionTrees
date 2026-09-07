@@ -68,7 +68,7 @@ Proof.
     + step. 
       apply pi_eqit_secure_sym.
       apply pi_eqit_secure_private_halt; auto.
-    + icbn. evis. eapply CIH; eauto. apply H1.
+    + down. evis. eapply CIH; eauto. apply H1.
  Qed.
 
 Lemma pi_eqit_secure_silent_diverger : forall A B RR (t1 : itree E2 A) (t2 : itree E2 B),
@@ -203,14 +203,14 @@ Proof.
     *)
     cbn in *|-. step in He. 
     remember (observe (Ret (s2, tt))).
-    icbn. rewrite observe_bind. 
+    down. rewrite observe_bind. 
     hinduction He before CIH; intros; try discriminate.
     + inv H. inv Heqi. cbn in *. constructor; auto. cbn. 
     eapply CIH; eauto. simpobs_subst. apply H1.  
     + constructor 3; auto. step in H. rewrite Heqi in H. clear Heqi. 
     generalize dependent t1. 
     accumulate CIH'. 
-    intros t1 H. icbn.
+    intros t1 H. down.
       rewrite observe_bind. inv H. 
       * constructor; auto. 
         inv H5. cbn in *. 
@@ -225,7 +225,7 @@ Proof.
       generalize dependent t4. 
       accumulate CIH'. 
       intros t4 H.
-      icbn. rewrite observe_bind. 
+      down. rewrite observe_bind. 
       dependent induction H; simpobs; try discriminate. 
       * constructor; auto. 
         inv H. inv Heqi. cbn in *. 
@@ -257,14 +257,14 @@ Proof.
     *)
     cbn in *|-. step in He. 
     remember (observe (Ret (s1, tt))).
-    icbn. rewrite observe_bind. 
+    down. rewrite observe_bind. 
     hinduction He before CIH; intros; try discriminate.
     + inv H. inv Heqi. cbn in *. constructor; auto. cbn. 
     eapply CIH; eauto. simpobs_subst. apply H1. now symmetry.   
     + constructor 4; auto. step in H. rewrite Heqi in H. clear Heqi. 
     generalize dependent t1. 
     accumulate CIH'. 
-    intros t1 H. icbn.
+    intros t1 H. down.
       rewrite observe_bind. inv H. 
       * constructor; auto. 
         inv H5. cbn in *. 
@@ -279,7 +279,7 @@ Proof.
       generalize dependent t4. 
       accumulate CIH'. 
       intros t4 H.
-      icbn. rewrite observe_bind. 
+      down. rewrite observe_bind. 
       dependent induction H; simpobs; try discriminate. 
       * constructor; auto. 
         inv H. inv Heqi. cbn in *. 
