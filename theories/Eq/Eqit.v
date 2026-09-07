@@ -2504,3 +2504,11 @@ Qed.
 Proof. 
   intros!; now eapply observing_eq_chain.
 Qed. 
+
+
+Ltac auto_ctrans :=
+  intros; repeat (match goal with [H: rcompose _ _ _ _ |- _] => destruct H end); subst; eauto.
+
+Ltac auto_ctrans_eq := try instantiate (1:=eq); auto_ctrans.
+
+Ltac euttsimpl := unfold eutt, euttge, eq_itree, eqit in *.
