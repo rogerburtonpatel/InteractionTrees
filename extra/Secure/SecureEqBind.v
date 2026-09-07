@@ -33,7 +33,7 @@ Proof.
   step. unfold ITree.bind at 1, observe at 1. cbn. simpobs.
   cbn. rewrite itree_eta' at 1. unstep. 
   generalize dependent t2. coinduction c CIH. intros t2 Ht2.
-  step in Ht2. icbn.  
+  step in Ht2. down.  
   unfold ITree.bind at 1. unfold observe at 2. cbn in *.
   inv Ht2; ddestruction; subst; try contra_size; try contradiction; try rewrite <- H; cbn;
   try unpriv_halt; eapply CIH; eauto;
@@ -59,7 +59,7 @@ Proof.
   step. unfold ITree.bind at 2, observe at 2. cbn. simpobs.
   cbn. rewrite itree_eta'. unstep.
   generalize dependent t1. coinduction c CIH. intros t1 Ht1.
-  step in Ht1. icbn.  
+  step in Ht1. down.  
   unfold ITree.bind at 1, observe at 1. cbn in *.
   inv Ht1; ddestruction; subst; try contra_size; try contradiction; cbn;
   try unpriv_halt; try contra_size; try (eapply CIH; eauto).
@@ -142,7 +142,7 @@ Lemma iter_bind_shalt_aux1:
 Proof.
   intros E B2 B1 A1 A2 RA RB b1 b2 Label priv l body1 body2 A e k1 t0 SECCHECK SIZECHECK H.
   generalize dependent t0. coinduction c CIH. intros t0 Ht0.
-  icbn. step in Ht0. rewrite observe_bind.   
+  down. step in Ht0. rewrite observe_bind.   
    cbn in *. inv Ht0; inv_vis_secure; cbn;  unpriv_halt; try contra_size;
     eauto.
   all: 
@@ -180,7 +180,7 @@ Lemma iter_bind_shalt_aux2:
 Proof.
   intros E B2 B1 A1 A2 RA RB b1 b2 Label priv l body1 body2 A e t0 k2 SECCHECK SIZECHECK H.
   generalize dependent t0. coinduction c CIH. intros t0 Ht0.
-  icbn. step in Ht0.
+  down. step in Ht0.
   rewrite observe_bind.   
    cbn in *. inv Ht0; inv_vis_secure; cbn;  unpriv_halt; try contra_size;
     eauto.
@@ -217,7 +217,7 @@ Lemma iter_bind_aux:
 Proof.
   intros E B2 B1 A1 A2 RA RB b1 b2 Label priv l body1 body2 c. 
   tower induction. intros CIH t1 t2 Ht12 Hbody. step in Ht12. 
-  icbn. 
+  down. 
   unfold observe. cbn. 
   hinduction Ht12 before E; intros; simpobs; cbn; eauto; 
   try (unpriv_co; fail);

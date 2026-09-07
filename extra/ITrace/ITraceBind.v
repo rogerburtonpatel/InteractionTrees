@@ -516,7 +516,7 @@ Lemma eqitF_observe_peel_cont_vis:
               ((peel_cont_ (VisF (evans A ev ans) k1) (VisF e k)))
               ((peel_cont_ (VisF (evans A ev ans) k2) (VisF e k))).
 Proof.
-  intros E R S A ev ans k1 k2 REL c CIH X e k. icbn. 
+  intros E R S A ev ans k1 k2 REL c CIH X e k. down. 
   unfold observe. cbn. unfold peel_cont_vis.
   destruct (classicT (A = X) ).
   - unfold eq_rect_r, eq_rect. remember (eq_sym e0) as He.
@@ -536,7 +536,6 @@ Proof.
   (* todo: this *)
   - destruct (observe b') eqn : Hb; destruct (observe b) eqn : Hb'; inversion H; subst; cbn;
       try solve [to_mon; constructor; eauto; now do 2 step]. 
-    + taus. now do 2 tactics.step.  
       + ddestruction. constructor. intros. inv H. 
       ddestruction. do 2 tactics.step. apply REL0. 
   (*looks like I didn't actually need to induct here ... *)
@@ -964,7 +963,7 @@ Lemma trace_prefix_peel : forall (E : Type -> Type) (S R : Type) (b : itrace E R
     trace_prefix (peel b t) b.
 Proof.
   intros E S R. coinduction c CIH. intros b t f Href. unfold peel.
-  destruct (observe b) eqn : Heqb; destruct (observe t) eqn : Heqt; icbn; cbn. 
+  destruct (observe b) eqn : Heqb; destruct (observe t) eqn : Heqt; down; cbn. 
   - cbn. auto with itree. 
   - simpobs. eapply trace_prefix_tau_ret; eauto.
   - symmetry in Heqb. symmetry in Heqt. apply simpobs in Heqb. apply simpobs in Heqt.

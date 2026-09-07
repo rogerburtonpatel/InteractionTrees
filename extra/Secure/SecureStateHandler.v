@@ -136,7 +136,7 @@ Lemma diverges_secure_equiv_halt_r : forall A R1 R2 RR (e : E1 A) (k : A -> itre
     diverges_with (fun _ e => ~ leq (priv1 _ e) l) t.
 Proof.
   intros A R1 R2 RR e k t Hemp Hsec. revert t. coinduction c CIH.
-  intros. step in H. icbn. 
+  intros. step in H. down. 
   cbn in *. remember (VisF e k) as ov.
   remember (observe t) as ot.
   hinduction H before S; intros; inv Heqov; ddestruction; subst; try discriminate;  try contradiction;
@@ -187,35 +187,35 @@ Proof.
     + constructor; auto. step. clear H1. clear CIH.
     generalize dependent t. coinduction c' CIH'. intros.
       sinv H2; use_simpobs.
-      * rewrite H1. icbn; cbn. 
+      * rewrite H1. down; cbn. 
       unpriv_halt.  
-      * rewrite H1. icbn; cbn. unpriv_halt.
+      * rewrite H1. down; cbn. unpriv_halt.
     + cbn. unpriv_co. eapply CIH; eauto. apply H4.
   -  destruct (classic_empty B0).
     +  clear H4. clear CIH. step. 
       generalize dependent t2. coinduction c' CIH. intros.
       inversion H0; use_simpobs.
-      * rewrite H4. icbn; cbn. unpriv_halt. eapply CIH; eauto. now step in H7. 
-      * rewrite H4. icbn; cbn. unpriv_halt. eapply CIH; eauto. unfold diverges_with. unstep. apply H7.  
-    + rewrite H4. icbn; cbn. unpriv_co. eapply CIH; eauto. apply H2.
+      * rewrite H4. down; cbn. unpriv_halt. eapply CIH; eauto. now step in H7. 
+      * rewrite H4. down; cbn. unpriv_halt. eapply CIH; eauto. unfold diverges_with. unstep. apply H7.  
+    + rewrite H4. down; cbn. unpriv_co. eapply CIH; eauto. apply H2.
   -  rewrite H4.
     destruct (classic_empty B0); destruct (classic_empty B1).
-    + icbn; cbn. unpriv_halt. contra_size.
+    + down; cbn. unpriv_halt. contra_size.
     + assert (diverges_with (fun _ e => ~ leq (priv2 _ e) l) (Vis e0 k0)) by 
        (step; constructor; auto). 
       rewrite <- H4. rewrite <- H4 in H9. clear H4. clear H1 CIH. step.
       generalize dependent t2.
       coinduction c0 CIH. intros. sinv H9; use_simpobs.
-      * rewrite H1. icbn; cbn. unpriv_halt. eapply CIH; eauto. now step in H4.  
-      * rewrite H1. icbn; cbn. unpriv_halt. eapply CIH; eauto. 
+      * rewrite H1. down; cbn. unpriv_halt. eapply CIH; eauto. now step in H4.  
+      * rewrite H1. down; cbn. unpriv_halt. eapply CIH; eauto. 
       specialize (H4 b). now step in H4. apply H4. 
     + assert (diverges_with (fun _ e => ~ leq (priv2 _ e) l) (Vis e k)) by 
        (step; constructor; auto). 
       rewrite <- H1. rewrite <- H1 in H9. clear H1. clear H CIH. step. generalize dependent t1.
       coinduction c0 CIH. intros. sinv H9; use_simpobs.
-      * rewrite H. icbn; cbn. unpriv_halt.
-      * rewrite H. icbn; cbn. unpriv_halt. eapply CIH; eauto. apply H1.
-    + icbn; cbn. unpriv_co. eapply CIH; eauto. apply H2. apply H5.
+      * rewrite H. down; cbn. unpriv_halt.
+      * rewrite H. down; cbn. unpriv_halt. eapply CIH; eauto. apply H1.
+    + down; cbn. unpriv_co. eapply CIH; eauto. apply H2. apply H5.
 Qed.
 
 Lemma silent_diverges_eqit_secure_spin : forall A B (RR : A -> B -> Prop) (t : itree E2 A),
