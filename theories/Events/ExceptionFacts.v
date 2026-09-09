@@ -79,8 +79,8 @@ Proof.
       rewrite 2 bind_map. rewrite 2 bind_ret_r. 
       step. apply Hk. 
     + bcbn. evis. step. cbn. etau. 
-  - cbn. (apply EqTauL; [auto|]). eapply IHHt; eauto.
-  - cbn. (apply EqTauR; [auto|]). eapply IHHt; eauto.
+  - cbn. taul. eapply IHHt; eauto.
+  - cbn. taur. eapply IHHt; eauto.
 Qed.
 
 
@@ -107,8 +107,8 @@ Proof.
   - destruct e.
     + destruct e. cbn. reflexivity. 
     + cbn. evis. step. cbn. etau. 
-  - cbn. (apply EqTauL; [auto|]). eapply IHHt; eauto.
-  - cbn. (apply EqTauR; [auto|]). eapply IHHt; eauto.
+  - cbn. taul. eapply IHHt; eauto.
+  - cbn. taur. eapply IHHt; eauto.
 Qed.
 
 Global Instance proper_eqitree_throw_prefix {E Err R b} : Proper (eqit eq b b ==> eqit eq b b) (@throw_prefix Err R E).
@@ -227,7 +227,7 @@ Proof.
     + destruct e. rewrite Heq. rewrite throw_prefix_exc. rewrite bind_vis. rewrite throw_prefix_exc.
       rewrite bind_ret_l. eret. 
     + rewrite Heq. rewrite throw_prefix_ev. repeat rewrite bind_vis. rewrite throw_prefix_ev.
-      evis. rewrite bind_tau. step. apply EqTau. apply CIH.  
+      evis. rewrite bind_tau. step. taus. apply CIH.  
 Qed.
 
 Lemma throw_prefix_iter : forall E Err A B (body : A -> itree (exceptE Err +' E) (A + B)  ) (init : A),

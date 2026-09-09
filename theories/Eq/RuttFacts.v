@@ -202,10 +202,10 @@ Proof.
 
   (* EqRet *)
   - clear x' y' Heqox' Heqoy'.
-    genobs x ox. remember (RetF r1) as or1. revert x Heqox.
+    genobs x ox. genret r1 or1. revert x Heqox.
     hinduction EQx before ox; try discriminate.
     + intros; subst; inv Heqor1. clear x Heqox.
-      genobs y oy. remember (RetF r2) as or2. revert y Heqoy.
+      genobs y oy. genret r2 or2. revert y Heqoy.
       hinduction EQy before oy; try discriminate.
       * subst; intros [=<-] ? ?. constructor. auto.
       * intros. apply EqTauR; auto. eapply IHEQy; eauto.
@@ -213,10 +213,10 @@ Proof.
 
   (* EqTau *)
   - clear x' y' Heqox' Heqoy'.
-    genobs x ox. remember (TauF m1) as om1. revert x Heqox.
+    genobs x ox. gentau m1 om1. revert x Heqox.
     hinduction EQx before ox; try discriminate.
     + intros [=<-] ? ?.
-      genobs y oy. remember (TauF m2) as om2. revert y Heqoy.
+      genobs y oy. gentau m2 om2. revert y Heqoy.
       hinduction EQy before oy; try discriminate.
       * intros [=<-] ? ?. to_mon_core. intros ? ?. down. constructor. eapply IH; eauto.
       * intros. apply EqTauR; auto. eapply IHEQy; eauto.
@@ -224,11 +224,11 @@ Proof.
 
   (* EqVis *)
   - clear x' y' Heqox' Heqoy'.
-    genobs x ox. remember (VisF e1 k1) as ot1. revert x Heqox.
+    genobs x ox. genvis e1 k1 ot1. revert x Heqox.
     hinduction EQx before ox; try discriminate.
     + intros. apply eq_inv_VisF_weak in Heqot1 as (-> & ? & ?); cbn in *; subst.
       clear x Heqox.
-      genobs y oy. remember (VisF e2 k2) as ot2. revert y Heqoy.
+      genobs y oy. genvis e2 k2 ot2. revert y Heqoy.
       hinduction EQy before oy; try discriminate.
       * intros. apply eq_inv_VisF_weak in Heqot2 as (-> & ? & ?); cbn in *; subst.
         constructor; auto. intros. eapply IH. apply (REL a). apply (REL0 b). apply H0; auto.

@@ -66,9 +66,9 @@ Proof.
   step in H0. 
   destruct H0; subst; try discriminate; cbn.
   - reflexivity. 
-  - apply EqTau; now apply CIH.  
+  - taus; now apply CIH.  
   - to_mon. ebind; intros; subst.  
-    + apply EqTau; auto with itree. 
+    + taus; auto with itree. 
 Qed.
 
 Lemma interp_state_ret {E F : Type -> Type} {R S : Type}
@@ -132,11 +132,11 @@ Proof.
   destruct (observe t).
   - bcbn. rewrite !bind_ret_l. 
     apply reflexivity.
-  - bcbn. apply EqTau. apply CIH.
+  - bcbn. taus. apply CIH.
   - bcbn. rewrite interp_state_vis, bind_bind.
     ebind; intros; subst. 
       rewrite bind_tau.
-      apply EqTau. now apply CIH. 
+      taus. now apply CIH. 
 Qed.
 
 #[global]
@@ -151,7 +151,7 @@ Proof.
   induction H; intros; subst; bcbn. 
   - eret. 
   - etau. 
-  - ebind; intros; subst. apply EqTau. apply CIH. apply REL. 
+  - ebind; intros; subst. taus. apply CIH. apply REL. 
   - rewrite tau_euttge, unfold_interp_state; eauto.
   - rewrite tau_euttge, unfold_interp_state; eauto.
 Qed.

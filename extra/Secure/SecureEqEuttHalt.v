@@ -18,6 +18,8 @@ Local Open Scope monad_scope.
 
 
 
+#[local] Ltac taul := apply secEqTauL; [auto|].
+#[local] Ltac taur := apply secEqTauR; [auto|].
 #[local] Ltac inv_e H := inv H; try discriminate. 
 
 #[global] Instance eq_itree_proper_secureChain {E R1 R2} b1 b2 Label priv (RR : R1 -> R2 -> Prop) l
@@ -40,11 +42,11 @@ Local Open Scope monad_scope.
   
     + clear x y Heqox Heqoy.
       genobs x' ox'.
-      remember (RetF r1) as or1.
+      genret r1 or1.
       revert x' Heqox'.
       hinduction EQx before ox'; try discriminate.
       * intros; subst; inv_e Heqor1. clear x' Heqox'.
-        genobs y' oy'; remember (RetF r2) as or2.
+        genobs y' oy'; genret r2 or2.
         revert y' Heqoy'.
         hinduction EQy before oy'; try discriminate.
         subst; intros [=<-] ??...
@@ -53,8 +55,8 @@ Local Open Scope monad_scope.
      and more could be done, though it really wants
      for better parallel machinery. just synced lines would be good. *)
     + inv_e EQx; inv_e EQy. constructor. eapply IH; eauto. 
-    + inv_e EQx. (apply secEqTauL; [auto|]). eapply IHEQ; eauto. now unstep. 
-    + inv_e EQy. (apply secEqTauR; [auto|]). eapply IHEQ; eauto. now unstep.
+    + inv_e EQx. taul. eapply IHEQ; eauto. now unstep. 
+    + inv_e EQy. taur. eapply IHEQ; eauto. now unstep.
     + inv_e EQx; ddestruction. constructor; auto. intros. 
       eapply H0; eauto. now unstep. 
     + inv_e EQy; ddestruction. constructor; auto. intros. 
@@ -75,17 +77,17 @@ Local Open Scope monad_scope.
 
   + clear x' y' Heqox' Heqoy'.
       genobs x ox.
-      remember (RetF r1) as or1.
+      genret r1 or1.
       revert x Heqox.
       hinduction EQx before ox; try discriminate.
       * intros; subst; inv_e Heqor1. clear x Heqox.
-        genobs y oy; remember (RetF r2) as or2.
+        genobs y oy; genret r2 or2.
         revert y Heqoy.
         hinduction EQy before oy; try discriminate.
         subst; intros [=<-] ??...
     + inv_e EQx; inv_e EQy. constructor. eapply IH; eauto. 
-    + inv_e EQx. (apply secEqTauL; [auto|]). eapply IHEQ; eauto. now unstep. 
-    + inv_e EQy. (apply secEqTauR; [auto|]). eapply IHEQ; eauto. now unstep.
+    + inv_e EQx. taul. eapply IHEQ; eauto. now unstep. 
+    + inv_e EQy. taur. eapply IHEQ; eauto. now unstep.
     + inv_e EQx; ddestruction. constructor; auto. intros. 
       eapply H0; eauto. now unstep. 
     + inv_e EQy; ddestruction. constructor; auto. intros. 
