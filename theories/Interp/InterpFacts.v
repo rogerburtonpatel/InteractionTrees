@@ -149,9 +149,9 @@ Proof.
   induction H0; intros; subst; cbn; eauto 4 with itree; to_mon.   
   eapply eqit_bind_chain. 
   - do 2 step. apply H. 
-  - intros ??[=<-]. taus; eauto 4 with itree. 
-  - taul. to_mon. rewrite unfold_interp. apply IHeqitF. 
-  - taur. to_mon. rewrite unfold_interp. apply IHeqitF. 
+  - intros ??[=<-]. apply EqTau; eauto 4 with itree. 
+  - (apply EqTauL; [auto|]). to_mon. rewrite unfold_interp. apply IHeqitF. 
+  - (apply EqTauR; [auto|]). to_mon. rewrite unfold_interp. apply IHeqitF. 
 Qed. 
 
 #[global]
@@ -168,8 +168,8 @@ Proof.
   induction H0; intros; subst; cbn; try discriminate; eauto 4 with itree; to_mon.
   eapply eqit_bind_chain. 
   - do 2 step. apply H. 
-  - intros ??[=<-]. taus; eauto 4 with itree. 
-  - taul. to_mon. rewrite unfold_interp. apply IHeqitF. 
+  - intros ??[=<-]. apply EqTau; eauto 4 with itree. 
+  - (apply EqTauL; [auto|]). to_mon. rewrite unfold_interp. apply IHeqitF. 
 Qed.
 
 #[global]
@@ -182,9 +182,9 @@ Proof.
   rewrite !unfold_interp.
   step in H.
   induction H; cbn; try discriminate; eauto 4 with itree; to_mon. 
-  - ebind. intros; subst; taus; eauto 4 with itree. 
-  - rewrite unfold_interp. now taul. 
-  - rewrite unfold_interp. now taur. 
+  - ebind. intros; subst; apply EqTau; eauto 4 with itree. 
+  - rewrite unfold_interp. now (apply EqTauL; [auto|]). 
+  - rewrite unfold_interp. now (apply EqTauR; [auto|]). 
 Qed.
 
 #[global]
@@ -223,10 +223,10 @@ Proof.
   rewrite unfold_bind, (unfold_interp t).
   destruct (observe t); cbn; to_mon. 
   - rewrite bind_ret_l. apply reflexivity.
-  - taus. fold_subst. apply CIH. 
+  - apply EqTau. fold_subst. apply CIH. 
   - rewrite interp_vis, bind_bind. ebind. 
     intros; subst.
-    rewrite bind_tau. taus. apply CIH. 
+    rewrite bind_tau. apply EqTau. apply CIH. 
 Qed.
 
 #[global] Hint Rewrite @interp_bind : itree.
@@ -240,7 +240,7 @@ Proof.
   rewrite (itree_eta t), unfold_interp.
   destruct (observe t); cbn.  
   - reflexivity. 
-  - taus. apply CIH. 
+  - apply EqTau. apply CIH. 
   - constructor. intro. fold_subst.
   rewrite bind_ret_, tau_euttge. apply CIH. 
 Qed.
@@ -267,7 +267,7 @@ Proof.
   rewrite 2 (unfold_interp t).
   destruct (observe t); cbn; eauto 4 with itree. 
   to_mon. rewrite interp_bind. ebind. intros; subst.  
-  rewrite interp_tau. taus. apply CIH.   
+  rewrite interp_tau. apply EqTau. apply CIH.   
 Qed.
 
 Lemma interp_translate {E F G} (f : E ~> F) (g : F ~> itree G) {R} (t : itree E R) :
@@ -280,8 +280,8 @@ Proof.
   rewrite unfold_translate_. unfold translateF.
   destruct (observe t); cbn.
   - apply reflexivity. (* SAZ: typeclass resolution failure? *)
-  - taus. apply CIH. 
-  - to_mon. ebind. intros; subst. taus. apply CIH.  
+  - apply EqTau. apply CIH. 
+  - to_mon. ebind. intros; subst. apply EqTau. apply CIH.  
 Qed.
 
 Lemma translate_to_interp {E F R} (f : E ~> F) (t : itree E R) :
@@ -306,7 +306,7 @@ Proof.
   rewrite interp_bind.
   ebind. intros; subst.
   rewrite interp_tau.
-  taus. apply CIH. 
+  apply EqTau. apply CIH. 
 Qed.
 
 Lemma interp_iter' {E F} (f : E ~> itree F) {I A}
@@ -323,7 +323,7 @@ Proof.
   ebind. 
   { do 2 step. apply EQ_t. }
   intros [] _ []; cbn; to_mon. 
-  - taus. apply CIH. 
+  - apply EqTau. apply CIH. 
   - reflexivity. 
 Qed.
 
@@ -348,7 +348,7 @@ Proof.
   ebind. 
   do 2 step. apply Heq.
   intros [] _ []; cbn.
-  - taus. apply CIH. 
+  - apply EqTau. apply CIH. 
   - reflexivity. 
 Qed.
 

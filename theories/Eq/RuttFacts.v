@@ -139,7 +139,7 @@ Proof.
       intros. specialize (H0 a b H2). now apply CIH.
 Qed.
 
-#[global] Instance eq_proper_ruttC {E1 E2 R1 R2 REv RAns}
+#[global] Instance eq_proper_ruttChain {E1 E2 R1 R2 REv RAns}
   (RR : R1 -> R2 -> Prop) (c : Chain (@rutt_mon E1 E2 R1 R2 REv RAns)):
   Proper (eq_itree eq ==> eq_itree eq ==> iff) (elem c RR).
 Proof.
@@ -173,7 +173,7 @@ Qed.
   Proper (eq_itree eq ==> eq_itree eq ==> iff) (@rutt E1 E2 R1 R2 REv RAns RR).
 Proof.
   unfold rutt. intros t1 t1' Ht1 t2 t2' Ht2.
-  apply eq_proper_ruttC; auto.
+  apply eq_proper_ruttChain; auto.
 Qed.
 
 #[global] Instance rutt_Proper_R2 {E1 E2 R1 R2}:
@@ -188,7 +188,7 @@ Proof.
   rewrite Ht1, Ht2. apply rutt_Proper_R; auto.
 Qed.
 
-#[global] Instance euttge_proper_ruttC {E1 E2 R1 R2 REv RAns}
+#[global] Instance euttge_proper_ruttChain {E1 E2 R1 R2 REv RAns}
   (RR : R1 -> R2 -> Prop) (c : Chain (@rutt_mon E1 E2 R1 R2 REv RAns)):
   Proper (euttge eq ==> euttge eq ==> flip impl) (elem c RR).
 Proof.
@@ -202,10 +202,10 @@ Proof.
 
   (* EqRet *)
   - clear x' y' Heqox' Heqoy'.
-    genobs x ox. genret r1 or1. revert x Heqox.
+    genobs x ox. remember (RetF r1) as or1. revert x Heqox.
     hinduction EQx before ox; try discriminate.
     + intros; subst; inv Heqor1. clear x Heqox.
-      genobs y oy. genret r2 or2. revert y Heqoy.
+      genobs y oy. remember (RetF r2) as or2. revert y Heqoy.
       hinduction EQy before oy; try discriminate.
       * subst; intros [=<-] ? ?. constructor. auto.
       * intros. apply EqTauR; auto. eapply IHEQy; eauto.
@@ -213,10 +213,10 @@ Proof.
 
   (* EqTau *)
   - clear x' y' Heqox' Heqoy'.
-    genobs x ox. gentau m1 om1. revert x Heqox.
+    genobs x ox. remember (TauF m1) as om1. revert x Heqox.
     hinduction EQx before ox; try easy.
     + intros [=<-] ? ?.
-      genobs y oy. gentau m2 om2. revert y Heqoy.
+      genobs y oy. remember (TauF m2) as om2. revert y Heqoy.
       hinduction EQy before oy; try easy.
       * intros [=<-] ? ?. to_rmon_core. intros ? ?. rcbn. constructor. eapply IH; eauto.
       * intros. apply EqTauR; auto. eapply IHEQy; eauto.
@@ -224,11 +224,11 @@ Proof.
 
   (* EqVis *)
   - clear x' y' Heqox' Heqoy'.
-    genobs x ox. genvis e1 k1 ot1. revert x Heqox.
+    genobs x ox. remember (VisF e1 k1) as ot1. revert x Heqox.
     hinduction EQx before ox; try easy.
     + intros. apply eq_inv_VisF_weak in Heqot1 as (-> & ? & ?); cbn in *; subst.
       clear x Heqox.
-      genobs y oy. genvis e2 k2 ot2. revert y Heqoy.
+      genobs y oy. remember (VisF e2 k2) as ot2. revert y Heqoy.
       hinduction EQy before oy; try easy.
       * intros. apply eq_inv_VisF_weak in Heqot2 as (-> & ? & ?); cbn in *; subst.
         constructor; auto. intros. eapply IH. apply (REL a). apply (REL0 b). apply H0; auto.
@@ -257,7 +257,7 @@ Qed.
   Proper (euttge eq ==> euttge eq ==> flip impl) (@rutt E1 E2 R1 R2 REv RAns RR).
 Proof.
   unfold rutt. intros t1 t1' Ht1 t2 t2' Ht2.
-  apply euttge_proper_ruttC; auto.
+  apply euttge_proper_ruttChain; auto.
 Qed.
 
 Lemma rutt_cong_eutt {E1 E2 R1 R2}:
