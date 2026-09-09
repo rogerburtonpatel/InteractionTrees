@@ -18,11 +18,9 @@ Local Open Scope monad_scope.
 
 
 
-#[local] Ltac taul := apply secEqTauL; [auto|].
-#[local] Ltac taur := apply secEqTauR; [auto|].
 #[local] Ltac inv_e H := inv H; try discriminate. 
 
-#[global] Instance eq_itree_proper_secureC {E R1 R2} b1 b2 Label priv (RR : R1 -> R2 -> Prop) l
+#[global] Instance eq_itree_proper_secureChain {E R1 R2} b1 b2 Label priv (RR : R1 -> R2 -> Prop) l
   (c : Chain (secure_eqit_mon Label priv RR b1 b2 l)) : 
   Proper (eq_itree (E := E) eq ==> eq_itree eq ==> iff) (elem c).
   Proof with eauto with itree.
@@ -42,11 +40,11 @@ Local Open Scope monad_scope.
   
     + clear x y Heqox Heqoy.
       genobs x' ox'.
-      genret r1 or1.
+      remember (RetF r1) as or1.
       revert x' Heqox'.
       hinduction EQx before ox'; try discriminate.
       * intros; subst; inv_e Heqor1. clear x' Heqox'.
-        genobs y' oy'; genret r2 or2.
+        genobs y' oy'; remember (RetF r2) as or2.
         revert y' Heqoy'.
         hinduction EQy before oy'; try discriminate.
         subst; intros [=<-] ??...
@@ -55,8 +53,8 @@ Local Open Scope monad_scope.
      and more could be done, though it really wants
      for better parallel machinery. just synced lines would be good. *)
     + inv_e EQx; inv_e EQy. constructor. eapply IH; eauto. 
-    + inv_e EQx. taul. eapply IHEQ; eauto. now unstep. 
-    + inv_e EQy. taur. eapply IHEQ; eauto. now unstep.
+    + inv_e EQx. (apply secEqTauL; [auto|]). eapply IHEQ; eauto. now unstep. 
+    + inv_e EQy. (apply secEqTauR; [auto|]). eapply IHEQ; eauto. now unstep.
     + inv_e EQx; ddestruction. constructor; auto. intros. 
       eapply H0; eauto. now unstep. 
     + inv_e EQy; ddestruction. constructor; auto. intros. 
@@ -77,17 +75,17 @@ Local Open Scope monad_scope.
 
   + clear x' y' Heqox' Heqoy'.
       genobs x ox.
-      genret r1 or1.
+      remember (RetF r1) as or1.
       revert x Heqox.
       hinduction EQx before ox; try discriminate.
       * intros; subst; inv_e Heqor1. clear x Heqox.
-        genobs y oy; genret r2 or2.
+        genobs y oy; remember (RetF r2) as or2.
         revert y Heqoy.
         hinduction EQy before oy; try discriminate.
         subst; intros [=<-] ??...
     + inv_e EQx; inv_e EQy. constructor. eapply IH; eauto. 
-    + inv_e EQx. taul. eapply IHEQ; eauto. now unstep. 
-    + inv_e EQy. taur. eapply IHEQ; eauto. now unstep.
+    + inv_e EQx. (apply secEqTauL; [auto|]). eapply IHEQ; eauto. now unstep. 
+    + inv_e EQy. (apply secEqTauR; [auto|]). eapply IHEQ; eauto. now unstep.
     + inv_e EQx; ddestruction. constructor; auto. intros. 
       eapply H0; eauto. now unstep. 
     + inv_e EQy; ddestruction. constructor; auto. intros. 
@@ -107,12 +105,12 @@ Local Open Scope monad_scope.
        step; now constructor. 
 Qed. 
 
-#[global] Instance eq_itree_proper_secureC_mon {E R1 R2} b1 b2 Label priv (RR : R1 -> R2 -> Prop) l
+#[global] Instance eq_itree_proper_secureChain_mon {E R1 R2} b1 b2 Label priv (RR : R1 -> R2 -> Prop) l
   (c : Chain (secure_eqit_mon Label priv RR b1 b2 l)) :
   Proper (eq_itree (E := E) eq ==> eq_itree eq ==> Basics.flip Basics.impl)
          (secure_eqit_mon Label priv RR b1 b2 l (elem c)).
 Proof.
-  repeat intro. eapply eq_itree_proper_secureC with (c := chain_b c); eauto.
+  repeat intro. eapply eq_itree_proper_secureChain with (c := chain_b c); eauto.
 Qed.
 
 Lemma tau_eqit_secure : forall E R1 R2 Label priv l RR (t1 : itree E R1) (t2 : itree E R2),

@@ -161,7 +161,7 @@ Proof.
   - rewrite unfold_interp_mrec. bcbn. 
     rewrite 2 interp_tau.
     rewrite (unfold_interp_mrec _ _ (Tau _)); cbn.
-    now taus. 
+    now apply EqTau. 
   - rewrite unfold_interp_mrec. bcbn.
     rewrite interp_vis.
     destruct e; bcbn.
@@ -178,7 +178,7 @@ Proof.
       rewrite !interp_tau.
       rewrite (unfold_interp_mrec _ _ (Tau _)); bcbn.
       rewrite !bind_tau.
-      taus. rewrite tau_euttge, <- interp_bind, <- 2 interp_mrec_bind.
+      apply EqTau. rewrite tau_euttge, <- interp_bind, <- 2 interp_mrec_bind.
       setoid_rewrite (tau_euttge (interp _ _)).
       rewrite <- interp_bind.
       auto.
@@ -194,7 +194,7 @@ Proof.
         reflexivity. }
       intros ? _ [].
       rewrite (unfold_interp_mrec _ _ (Tau _)); bcbn.
-      taus. 
+      apply EqTau. 
       rewrite tau_euttge.
       apply CIH. 
 Qed.
@@ -233,7 +233,7 @@ Proof with eauto with itree.
   - rewrite (itree_eta t); destruct (observe t).
     + rewrite interp_ret, 2 bind_ret_l. auto.
     + rewrite interp_tau, 2 bind_tau, 2 unfold_interp_mrec; bcbn.
-      taus...  
+      apply EqTau...  
     + rewrite interp_vis, bind_vis.
       rewrite bind_bind.
       rewrite (unfold_interp_mrec _ _ (Vis _ _)); bcbn.
@@ -241,7 +241,7 @@ Proof with eauto with itree.
       * unfold cat at 3, Cat_Handler at 3, Handler.cat.
         change (g X b) with (Tau (g0 X b)).
         rewrite bind_tau, unfold_interp_mrec; bcbn.
-        taus. rewrite tau_euttge...
+        apply EqTau. rewrite tau_euttge...
       * unfold inr_, Inr_sum1_Handler, Handler.inr_, Handler.htrigger.
         rewrite bind_trigger.
         rewrite unfold_interp_mrec; bcbn.
@@ -249,7 +249,7 @@ Proof with eauto with itree.
   - rewrite (itree_eta t); destruct (observe t).
     + rewrite interp_ret, 2 bind_ret_l. auto.
     + rewrite interp_tau, 2 bind_tau, 2 unfold_interp_mrec; bcbn.
-      taus...  
+      apply EqTau...  
     + rewrite interp_vis, bind_vis.
       rewrite bind_bind.
       rewrite (unfold_interp_mrec _ _ (Vis _ _)); bcbn.
@@ -257,7 +257,7 @@ Proof with eauto with itree.
       * unfold cat at 2, Cat_Handler at 2, Handler.cat.
         change (f X a) with (Tau (f0 X a)).
         rewrite !bind_tau, (unfold_interp_mrec _ _ (Tau _)); bcbn.
-        taus. rewrite tau_euttge... 
+        apply EqTau. rewrite tau_euttge... 
       * unfold inr_, Inr_sum1_Handler, Handler.inr_, Handler.htrigger.
         rewrite bind_trigger.
         rewrite unfold_interp_mrec; bcbn.
@@ -334,7 +334,7 @@ Proof.
   all: rewrite (unfold_interp_mrec _ _ (go _)), unfold_interp; bcbn.
   1,2: rewrite unfold_interp_mrec; bcbn.
   1,2: rewrite (unfold_interp_mrec _ _ (go _)); eauto with itree.
-  taus. apply CIH. 
+  apply EqTau. apply CIH. 
   destruct e.
   - rewrite (interp_mrec_bind _ (ITree.trigger _)).
     rewrite interp_mrec_trigger; bcbn.
@@ -343,17 +343,17 @@ Proof.
     rewrite interp_tau, unfold_interp_mrec; bcbn.
     rewrite (unfold_interp_mrec _ _ (Tau _)); bcbn.
     rewrite !bind_tau.
-    taus. 
+    apply EqTau. 
     rewrite tau_euttge. setoid_rewrite tau_euttge.
     rewrite <- interp_mrec_bind, <- interp_bind.
     auto.
   - rewrite bind_trigger.
     setoid_rewrite tau_euttge.
     rewrite 2 unfold_interp_mrec; bcbn.
-    destruct s. taus. 
+    destruct s. apply EqTau. 
     rewrite <- interp_mrec_bind, <- interp_bind.
     apply CIH. 
-    constructor; intros. now step; taus.  
+    constructor; intros. now step; apply EqTau.  
 Qed.
 
 Global Instance Iterative_Handler : Iterative Handler sum1.

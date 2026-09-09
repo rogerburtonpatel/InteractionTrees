@@ -522,7 +522,7 @@ Proof.
   - unfold eq_rect_r, eq_rect. remember (eq_sym e0) as He.
     dependent destruction He. cbn. constructor.
     intros.  eapply CIH. auto with itree.
-  - cbn. taus. reflexivity. 
+  - cbn. apply Eqit.EqTau. reflexivity. 
 Qed.  
 
 
@@ -578,12 +578,12 @@ Proof.
   intros E R S. coinduction c CIH. intros. step in H. cbn in H. dependent induction H; subst.
   - simpobs. cbn. reflexivity. 
   - simpobs. destruct (observe b) eqn : Hb.
-    + cbn. taul. simpobs. to_mon. 
+    + cbn. (apply Eqit.EqTauL; [auto|]). simpobs. to_mon. 
       rewrite <- itree_eta. 
       specialize (IHeqitF CIH (Ret r) t1 s ); auto.
-    + cbn. rewrite Hb. taus. eapply CIH with (s := s).
+    + cbn. rewrite Hb. apply Eqit.EqTau. eapply CIH with (s := s).
       step. auto.
-    + cbn. rewrite Hb. taul. rewrite <- Hb. 
+    + cbn. rewrite Hb. (apply Eqit.EqTauL; [auto|]). rewrite <- Hb. 
       specialize (IHeqitF CIH b t1 s ); auto.
       assert (S = S). auto. apply IHeqitF; auto.
 Qed.
@@ -596,7 +596,7 @@ Proof.
   revert b t t'. coinduction c CIH. intros. step in H. dependent induction H.
   - simpobs. reflexivity. 
   - simpobs. destruct (observe b) eqn : Heqb; cbn.
-    + cbn. taus. rewrite <- Heqb. eapply CIH. auto.
+    + cbn. apply Eqit.EqTau. rewrite <- Heqb. eapply CIH. auto.
     + etau. 
     + constructor. rewrite <- Heqb. eapply CIH; auto.
   - simpobs.  destruct (observe b) eqn : Heqb; red; cbn.
@@ -628,7 +628,7 @@ Proof.
       *
       symmetry in H. unstep in H. 
       eapply peel_cont_ret_inv with (b := t0) in H. cbn in H. 
-      taus. symmetry. now do 2 tactics.step. 
+      apply Eqit.EqTau. symmetry. now do 2 tactics.step. 
       * constructor. eapply CIH.  rewrite <- tau_eutt at 1. step. auto.
       * constructor. rewrite <- Heqt. eapply CIH.
         step. rewrite Heqt. auto.

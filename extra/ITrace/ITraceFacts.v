@@ -570,13 +570,13 @@ Proof.
   (*Ret Tau *)
   - setoid_rewrite Ht2 in H.
     specialize (H (Ret r) ).
-    rewrite tau_eutt in H. taur. 
+    rewrite tau_eutt in H. (apply Eqit.EqTauR; [auto|]). 
     assert (Ret r ⊑ t1).
     { rewrite Ht1. step. eret. }
     apply H in H0. step in H0. repeat red in H0; cbn in H0.
     clear H Ht1 Ht2 Heqot1 Heqot2. dependent induction H0.
     + rewrite <- x. eret. 
-    + rewrite <- x. taur; auto.   
+    + rewrite <- x. (apply Eqit.EqTauR; [auto|]); auto.   
   (*Ret Vis*)
   - exfalso.
     assert (Ret r ⊑ t1).
@@ -588,9 +588,9 @@ Proof.
     { rewrite Ht2. step. eret. }
     rewrite Ht2 in H0. apply H in H0 as H1. step in H1. 
     clear Heqot1 Heqot2 Ht1 Ht2 H H0. repeat red in H1. cbn in *.
-    taul. inv H1. dependent induction H2; intros; subst.
+    (apply Eqit.EqTauL; [auto|]). inv H1. dependent induction H2; intros; subst.
     + rewrite <- x. eret. 
-    + rewrite <- x. taul; auto. 
+    + rewrite <- x. (apply Eqit.EqTauL; [auto|]); auto. 
   (*Tau Tau*)
   - constructor. eapply CIH. 
     intros.

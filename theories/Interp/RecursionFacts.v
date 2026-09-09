@@ -85,12 +85,12 @@ Proof.
   coinduction. intros.
   rewrite !unfold_interp_mrec.
   step in H. inv H; eauto with itree. 
-  - taus. now apply CIH. 
+  - apply EqTau. now apply CIH. 
   - cbn. destruct e.
-    + taus. apply CIH.
+    + apply EqTau. apply CIH.
       ebind. intros; subst.  
     do 2 step. apply REL. 
-    + constructor. intro. step. taus. apply CIH.
+    + constructor. intro. step. apply EqTau. apply CIH.
     apply REL.   
   - easy. 
   - easy. 
@@ -106,13 +106,13 @@ Proof.
   destruct (observe t); cbn;
     [| |destruct e]; cbn. 
   - apply reflexivity.
-  - taus. fold_subst. apply CIH. 
-  - to_mon. taus. fold_subst. 
+  - apply EqTau. fold_subst. apply CIH. 
+  - to_mon. apply EqTau. fold_subst. 
     rewrite <- bind_bind.
     apply CIH.  
   - constructor. intro. fold_subst. 
     rewrite bind_ret_l, bind_tau. 
-    step. taus. apply CIH.   
+    step. apply EqTau. apply CIH.   
 Qed.
 
 Theorem interp_mrec_trigger {U} (a : (D +' E) U) :
@@ -134,9 +134,9 @@ Proof.
   revert_until T. coinduction. intros.
   rewrite unfold_interp_mrec, unfold_interp.
   destruct (observe c0); [| |destruct e]; simpl; eauto.
-  - now taur. 
-  - taus. apply CIH. 
-  - taus. rewrite interp_mrec_bind. unfold mrec.
+  - now (apply EqTauR; [auto|]). 
+  - apply EqTau. apply CIH. 
+  - apply EqTau. rewrite interp_mrec_bind. unfold mrec.
   ebind. intros; subst. apply CIH. 
   - to_mon. rewrite tau_euttge. 
     unfold ITree.trigger.  rewrite bind_vis.
@@ -164,21 +164,21 @@ Proof.
   rewrite <- tau_eutt.
   revert t. coinduction. intros.
   rewrite (itree_eta t); destruct (observe t).
-  - rewrite 2 unfold_interp_mrec; now taul. 
+  - rewrite 2 unfold_interp_mrec; now (apply EqTauL; [auto|]). 
   - rewrite unfold_interp, 2 unfold_interp_mrec. 
-    taus. apply CIH. 
+    apply EqTau. apply CIH. 
   - rewrite interp_vis.
     rewrite (unfold_interp_mrec _ (Vis _ _)).
     destruct e; cbn; to_mon. 
     + rewrite 2 interp_mrec_bind.
-      taus. 
+      apply EqTau. 
       ebind; intros; subst. 
       rewrite unfold_interp_mrec; cbn; apply CIH. 
     + unfold inr_, Handler.Inr_sum1_Handler, Handler.Handler.inr_, Handler.Handler.htrigger.
       rewrite bind_trigger, unfold_interp_mrec; cbn; to_mon.
       rewrite tau_euttge.
       constructor.
-      intros. step. taus. 
+      intros. step. apply EqTau. 
       rewrite unfold_interp_mrec; cbn.
       apply CIH. 
 Qed.
@@ -200,7 +200,7 @@ Proof.
   3: { destruct e; constructor. 
     + apply CIH. ebind. apply Hfg.  
       intros ? _ []. apply REL. 
-    + intros; step; taus. eauto with itree.
+    + intros; step; apply EqTau. eauto with itree.
   }
   1,2: constructor; auto with itree.
   all: to_mon; rewrite unfold_interp_mrec, tau_euttge; auto.
@@ -244,7 +244,7 @@ Proof.
   3: { destruct e; constructor. 
     + apply CIH. ebind. apply Hfg.  
       intros ? _ []. apply REL. 
-    + intros; step; taus. eauto with itree.
+    + intros; step; apply EqTau. eauto with itree.
   }
   1,2: constructor; auto with itree.
   all: to_mon; rewrite unfold_interp_mrec, tau_euttge; auto.
