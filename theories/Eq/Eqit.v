@@ -407,9 +407,6 @@ Ltac solve_eqitF :=
    [taus] is simply the [EqTau] constructor, and serves the same purpose. 
    *)
 
-Ltac taul := apply EqTauL; [auto|].
-Ltac taur := apply EqTauR; [auto|]. 
-Ltac taus := apply EqTau. 
 
 (* inf_closed automation *)
 Ltac inf_closed_forall_auto := 
@@ -759,9 +756,9 @@ Section eqit_inv.
     step.   
     remember (observe (Tau t1)).
     induction H; inv Heqi.  
-    - step in REL. now taur.
+    - step in REL. now (apply EqTauR; [auto|]).
     - assumption. 
-    - taur. now apply IHeqitF. 
+    - (apply EqTauR; [auto|]). now apply IHeqitF. 
   Qed. 
 
   Lemma eqit_inv_Tau_r t1 t2 :
@@ -772,8 +769,8 @@ Section eqit_inv.
     step.   
     remember (observe (Tau t2)).
     induction H; inv Heqi.  
-    - step in REL. now taul. 
-    - taul. now apply IHeqitF.
+    - step in REL. now (apply EqTauL; [auto|]). 
+    - (apply EqTauL; [auto|]). now apply IHeqitF.
     - assumption.  
   Qed. 
 
@@ -788,13 +785,13 @@ Section eqit_inv.
     induction H; intros t1' t2' Heqot1 Heqot2; try discriminate; subst.
     - inv Heqot1; inv Heqot2. now unstep.  
     - inv H; inv Heqot1; simpobs. 
-      + taul. now step in REL.  
-      + taul. now apply IHeqitF.
+      + (apply EqTauL; [auto|]). now step in REL.  
+      + (apply EqTauL; [auto|]). now apply IHeqitF.
       + easy.   
     - inv H; inv Heqot2; simpobs. 
-      + taur. now step in REL. 
+      + (apply EqTauR; [auto|]). now step in REL. 
       + easy. 
-      + taur. now apply IHeqitF. 
+      + (apply EqTauR; [auto|]). now apply IHeqitF. 
   Qed. 
 
   Lemma eqit_inv_Tau t1 t2 :
@@ -821,9 +818,6 @@ Section eqit_inv.
 
 End eqit_inv.
 
-Ltac genret r or := remember (RetF r) as or.
-Ltac gentau t ot := remember (TauF t) as ot.
-Ltac genvis e k ot := remember (VisF e k) as ot.
 
 Lemma euttge_tau_r_inv [E R1 R2 RR] (t : itree E R1) (u : itree E R2) :
   euttge RR t (Tau u) -> exists t', observe t = TauF t'.
@@ -849,7 +843,7 @@ Proof.
     edestruct euttge_tau_r_inv; [step; eauto |].
     step.
     simpobs.
-    taul.
+    (apply EqTauL; [auto|]).
     unstep.
     eapply IHEQ; eauto.
 Qed.
@@ -869,56 +863,56 @@ Proof with eauto with itree.
     induction EQ; intros.
     + clear x' y' Heqox' Heqoy'.
       genobs x ox.
-      genret r1 or1.
+      remember (RetF r1) as or1.
       revert x Heqox.
       hinduction EQx before ox; try discriminate.
       * intros; subst; inv Heqor1. clear x Heqox.
-        genobs y oy; genret r2 or2.
+        genobs y oy; remember (RetF r2) as or2.
         revert y Heqoy.
         hinduction EQy before oy; try discriminate.
         subst; intros [=<-] ??...
-        now intros; taur; eapply IHEQy.
-      * intros; subst; taul; eapply IHEQx...
+        now intros; (apply EqTauR; [auto|]); eapply IHEQy.
+      * intros; subst; (apply EqTauL; [auto|]); eapply IHEQx...
     + clear x' y' Heqox' Heqoy'.
       genobs x ox.
-      gentau m1 om1.
+      remember (TauF m1) as om1.
       revert x Heqox.
       hinduction EQx before ox; try discriminate.
       * intros [=<-] ? ??.
         clear x Heqox.
-        genobs y oy; gentau m2 om2.
+        genobs y oy; remember (TauF m2) as om2.
         revert y Heqoy.
         hinduction EQy before oy; try discriminate.
         intros [=<-] ??...
         intros.
-        taur.
+        (apply EqTauR; [auto|]).
         now eapply IHEQy.
-      * intros; subst; taul; eapply IHEQx...
+      * intros; subst; (apply EqTauL; [auto|]); eapply IHEQx...
     + clear x' y' Heqox' Heqoy'.
       genobs x ox.
-      genvis e k1 ot1.
+      remember (VisF e k1) as ot1.
       revert x Heqox.
       hinduction EQx before ox; try discriminate.
       * intros.
         apply eq_inv_VisF_weak in Heqot1 as (-> & ? & ?); cbn in *; subst.
         clear x Heqox.
-        genobs y oy; genvis e k2 ot2.
+        genobs y oy; remember (VisF e k2) as ot2.
         revert y Heqoy.
         hinduction EQy before oy; try discriminate.
         intros; apply eq_inv_VisF_weak in Heqot2 as (-> & ? & ?); cbn in *; subst; eauto with itree.
         intros.
-        taur.
+        (apply EqTauR; [auto|]).
         now eapply IHEQy.
-      * intros; subst; taul; eapply IHEQx...
+      * intros; subst; (apply EqTauL; [auto|]); eapply IHEQx...
     + edestruct euttge_tau_r_inv; [step; eauto |].
       simpobs.
-      taul.
+      (apply EqTauL; [auto|]).
       eapply IHEQ; eauto.
       assert (euttge eq (Tau x0) (Tau t1)) by (now step).
       unstep; eapply euttge_tau_inv; eauto.
     + edestruct euttge_tau_r_inv; [step; eauto |].
       simpobs.
-      taur.
+      (apply EqTauR; [auto|]).
       eapply IHEQ; eauto.
       assert (euttge eq (Tau x0) (Tau t2)) by (now step).
       unstep; eapply euttge_tau_inv; eauto.
@@ -994,21 +988,21 @@ Proof with eauto with itree.
   1-2: inv H; inv H0; try discriminate; 
   eauto 4 with itree.
   (* vis *)
-  - genvis e k1 ok1; inv H; simpobs; try discriminate. 
-    genvis e k2 ok2; inv H0; simpobs; try discriminate. 
+  - remember (VisF e k1) as ok1; inv H; simpobs; try discriminate. 
+    remember (VisF e k2) as ok2; inv H0; simpobs; try discriminate. 
     do 2 inv_Vis. eauto with itree.
   (* inductive steps *)
-  - inv H; try discriminate; simpobs; taul; eapply IHeqitF; eauto; now step in REL.
-  - inv H0; try discriminate; simpobs; taur; eapply IHeqitF; eauto; now step in REL.
+  - inv H; try discriminate; simpobs; (apply EqTauL; [auto|]); eapply IHeqitF; eauto; now step in REL.
+  - inv H0; try discriminate; simpobs; (apply EqTauR; [auto|]); eapply IHeqitF; eauto; now step in REL.
   - inv H; inv H0; constructor; eauto 4 with itree; easy. 
   - inv H; inv H0; try discriminate; eauto 4 with itree.  
   (* vis *)
-  - genvis e k1 ok1; inv H; simpobs; try discriminate. 
-    genvis e k2 ok2; inv H0; simpobs; try discriminate. 
+  - remember (VisF e k1) as ok1; inv H; simpobs; try discriminate. 
+    remember (VisF e k2) as ok2; inv H0; simpobs; try discriminate. 
     do 2 inv_Vis. eauto with itree.
   (* inductive steps *)
-  - inv H; try discriminate; simpobs; taul; eapply IHeqitF; eauto; now step in REL.
-  - inv H0; try discriminate; simpobs; taur; eapply IHeqitF; eauto; now step in REL.
+  - inv H; try discriminate; simpobs; (apply EqTauL; [auto|]); eapply IHeqitF; eauto; now step in REL.
+  - inv H0; try discriminate; simpobs; (apply EqTauR; [auto|]); eapply IHeqitF; eauto; now step in REL.
 Qed.
 
 (* [euttge_proper_euttgeChain] with [euttge eq] on BOTH arguments is FALSE.
@@ -1029,7 +1023,7 @@ assert (Hfalse : euttge (E := fun _ => False) (R1 := unit) (R2 := unit) eq
   (* ^ this works because the canonical chain structure uses chain_gfp
      to coerce things into the right shape. *)
     - reflexivity.
-    - step. taul. reflexivity.
+    - step. (apply EqTauL; [auto|]). reflexivity.
     - reflexivity. }
   step in Hfalse. inv Hfalse. inversion CHECK. 
 Qed.  
@@ -1058,44 +1052,44 @@ Proof with eauto with itree.
     induction EQ; intros.
     + clear x' y' Heqox' Heqoy'.
       genobs x ox.
-      genret r1 or1.
+      remember (RetF r1) as or1.
       revert x Heqox.
       hinduction EQx before ox; try discriminate.
       * intros; subst; inv Heqor1. clear x Heqox.
-        genobs y oy; genret r2 or2.
+        genobs y oy; remember (RetF r2) as or2.
         revert y Heqoy.
         (* EQy is eq_itree eq (b1=b2=false): EqTauL/EqTauR cases dismissed by [try discriminate] *)
         hinduction EQy before oy; try discriminate.
         subst; intros [=<-] ??...
-      * intros; subst; taul; eapply IHEQx...
+      * intros; subst; (apply EqTauL; [auto|]); eapply IHEQx...
     + clear x' y' Heqox' Heqoy'.
       genobs x ox.
-      gentau m1 om1.
+      remember (TauF m1) as om1.
       revert x Heqox.
       hinduction EQx before ox; try discriminate.
       * intros [=<-] ? ??.
         clear x Heqox.
-        genobs y oy; gentau m2 om2.
+        genobs y oy; remember (TauF m2) as om2.
         revert y Heqoy.
         hinduction EQy before oy; try discriminate.
         intros [=<-] ??...
-      * intros; subst; taul; eapply IHEQx...
+      * intros; subst; (apply EqTauL; [auto|]); eapply IHEQx...
     + clear x' y' Heqox' Heqoy'.
       genobs x ox.
-      genvis e k1 ot1.
+      remember (VisF e k1) as ot1.
       revert x Heqox.
       hinduction EQx before ox; try discriminate.
       * intros.
         apply eq_inv_VisF_weak in Heqot1 as (-> & ? & ?); cbn in *; subst.
         clear x Heqox.
-        genobs y oy; genvis e k2 ot2.
+        genobs y oy; remember (VisF e k2) as ot2.
         revert y Heqoy.
         hinduction EQy before oy; try discriminate.
         intros; apply eq_inv_VisF_weak in Heqot2 as (-> & ? & ?); cbn in *; subst; eauto with itree.
-      * intros; subst; taul; eapply IHEQx...
+      * intros; subst; (apply EqTauL; [auto|]); eapply IHEQx...
     + edestruct euttge_tau_r_inv; [step; eauto |].
       simpobs.
-      taul.
+      (apply EqTauL; [auto|]).
       eapply IHEQ; eauto.
       assert (euttge eq (Tau x0) (Tau t1)) by (now step).
       unstep; eapply euttge_tau_inv; eauto.
@@ -1130,8 +1124,8 @@ Proof.
   all: 
   inv H2; simpobs.
   all: 
-  try genvis e k1 ok1; inv H0; simpobs;
-  try genvis e k2 ok2; inv H1; simpobs. 
+  try remember (VisF e k1) as ok1; inv H0; simpobs;
+  try remember (VisF e k2) as ok2; inv H1; simpobs. 
   all: try do 2 inv_Vis; constructor; intros; try eapply H; eauto.
   all: inv H1; inv H0.  
   all: 
@@ -1167,7 +1161,7 @@ Proof.
   in each case, we perform induction on t2 ~ t3.  *)
   hinduction INL before CIH; intros; subst. clear t1 t2.
   (* Ret, straightforward *)
-  - genret r2 ot.
+  - remember (RetF r2) as ot.
     hinduction INR before CIH; intros; inv Heqot; eauto 4 with itree.
   - genobs t3 ot3. 
     (* need something more: t3 is either a τ node, or it isn't. *)
@@ -1182,7 +1176,7 @@ Proof.
       now step.    
     (* τ - ̸τ : we do further case analysis. *)
     + inv INR; try (exfalso; eapply EQ; eauto; fail).
-      taul. 
+      (apply EqTauL; [auto|]). 
       step in REL.
       hinduction REL0 before CIH; intros; try (exfalso; eapply EQ; eauto; fail).
       (* now we can handle each subcase with another layer of induction *)
@@ -1200,13 +1194,13 @@ Proof.
     econstructor. intros.
     apply (CIH _ _ _ (REL0 v) (REL v)). 
   - eauto 4 with itree.
-  - gentau t0 ot.
+  - remember (TauF t0) as ot.
     genobs t3 ot3. 
     hinduction INR before CIH; intros; try inversion Heqot; subst.
     + eapply (IHINL (Tau m2)).
       step in REL. eauto 4 with itree.
     + now eapply IHINL.
-    + taur. eapply IHINR; eauto. 
+    + (apply EqTauR; [auto|]). eapply IHINR; eauto. 
 Qed.
 
 Arguments eqit_trans {E R1 R2 R3} [RR1 RR2 b1 b2 t1 t2 t3].
@@ -1676,7 +1670,7 @@ Proof.
   split; intros H.
   - eapply transitivity. 2 : apply H. 
     apply eqit_Tau_r. reflexivity.
-  - step. taul. now step in H. 
+  - step. (apply EqTauL; [auto|]). now step in H. 
 Qed.
 
 Lemma tau_eutt_RR_r : forall E R (RR : relation R) (HRR: Reflexive RR) (HRT: Transitive RR) (t s : itree E R),
@@ -1686,7 +1680,7 @@ Proof.
   split; intros H.
   - eapply transitivity. apply H.
     apply eqit_Tau_l. reflexivity.
-  - step. taur. now step in H.
+  - step. (apply EqTauR; [auto|]). now step in H.
 Qed.
 
 Lemma eutt_inv_Ret_l {E R} (r1: R) (t2: itree E R):
@@ -1787,13 +1781,13 @@ Proof.
     hinduction H before RR; intros; inv Heqi; try inv Heqi0. 
     + now unstep. 
     + inv H. 
-      * taul. eapply IHeqitF; eauto. 
-      * taul. eapply IHeqitF; eauto.
+      * (apply EqTauL; [auto|]). eapply IHeqitF; eauto. 
+      * (apply EqTauL; [auto|]). eapply IHeqitF; eauto.
       * assumption. 
     + inv H. 
-      * taur. eapply IHeqitF; eauto.
+      * (apply EqTauR; [auto|]). eapply IHeqitF; eauto.
       * assumption.  
-      * taur. eapply IHeqitF; eauto. 
+      * (apply EqTauR; [auto|]). eapply IHeqitF; eauto. 
   - step. now constructor.   
 Qed. 
 
@@ -1859,12 +1853,12 @@ Proof.
   (* taul *)
   + rewrite observe_bind. 
     simpobs. 
-    taul. 
+    (apply EqTauL; [auto|]). 
     eapply IHeqitF; eauto.  
   (* taur *)
   + setoid_rewrite observe_bind at 2. 
     simpobs. 
-    taur. 
+    (apply EqTauR; [auto|]). 
     eapply IHeqitF; eauto. 
 Qed. 
 
@@ -2179,7 +2173,7 @@ Proof.
       edestruct IHeqitF; eauto. exists x. 
       destruct H0. 
       split; eauto.
-      step; rewrite Ema. taul. 
+      step; rewrite Ema. (apply EqTauL; [auto|]). 
       now step in H0. 
 Qed.
 
@@ -2524,13 +2518,13 @@ Proof.
   genobs t ot; genobs s os.
   hinduction EQ before CIH; subst; intros; simpl.
   - inv EQ'. eret. now constructor. 
-  - taus. eapply CIH; eauto. apply eqit_inv_Tau. now step.  
+  - apply EqTau. eapply CIH; eauto. apply eqit_inv_Tau. now step.  
   - constructor. intro v. specialize (REL v).
     eapply CIH; eauto. 
     now eapply eqitF_inv_VisF in EQ'; eauto.
-  - taul. eapply IHEQ; eauto. subst. unstep. eapply eqit_inv_Tau_l. 
+  - (apply EqTauL; [auto|]). eapply IHEQ; eauto. subst. unstep. eapply eqit_inv_Tau_l. 
     now step.  
-  - taur. eapply IHEQ; eauto. subst. unstep. eapply eqit_inv_Tau_r. 
+  - (apply EqTauR; [auto|]). eapply IHEQ; eauto. subst. unstep. eapply eqit_inv_Tau_r. 
     now step.  
 Qed.
 
@@ -2597,7 +2591,7 @@ Proof.
     now rewrite <- Heq at 2.
   - constructor. intros v. eapply eqit_inv_Vis in Heq.
     specialize (REL v). eapply CIH. now rewrite <- Heq at 2.
-  - taul; taur. apply IHHeutt. rewrite <- (itree_eta t1).   
+  - (apply EqTauL; [auto|]); (apply EqTauR; [auto|]). apply IHHeutt. rewrite <- (itree_eta t1).   
     now rewrite tau_euttge in Heq. 
   - apply IHHeutt. rewrite <- (itree_eta).   
     now rewrite tau_euttge in Heq. 
