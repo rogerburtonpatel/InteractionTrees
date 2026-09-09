@@ -33,7 +33,6 @@ Local Open Scope itree_scope.
 Section RuttF.
 
   Context {E1 E2 : Type -> Type}.
-  Context {R1 R2 : Type}.
   (* From the point of view of relational parametricity, it would be more fitting
   to replace [(REv, RAns)] with one [REv : forall A1 A2, (A1 -> A2 -> Prop) -> (E1 A1 -> E2 A2 -> Prop)].
   Contributions to that effect are welcome. *)
@@ -42,7 +41,7 @@ Section RuttF.
   Arguments REv {A} {B}.
   Arguments RAns {A} {B}.
 
-  Inductive ruttF (RR: R1 -> R2 -> Prop) (sim : itree E1 R1 -> itree E2 R2 -> Prop) : itree' E1 R1 -> itree' E2 R2 -> Prop :=
+  Inductive ruttF {R1 R2 : Type} (RR: R1 -> R2 -> Prop) (sim : itree E1 R1 -> itree E2 R2 -> Prop) : itree' E1 R1 -> itree' E2 R2 -> Prop :=
   | EqRet : forall (r1 : R1) (r2 : R2),
       RR r1 r2 ->
       ruttF RR sim (RetF r1) (RetF r2)
@@ -61,19 +60,23 @@ Section RuttF.
       ruttF RR sim ot1 (TauF t2).
   Hint Constructors ruttF : itree.
 
-  Definition rutt_ (sim : (R1 -> R2 -> Prop) -> itree E1 R1 -> itree E2 R2 -> Prop) :
-    (R1 -> R2 -> Prop) -> itree E1 R1 -> itree E2 R2 -> Prop :=
-    fun RR t1 t2 =>
-      ruttF RR (sim RR) (observe t1) (observe t2).
+  Definition rutt_ (sim : forall R1 R2, (R1 -> R2 -> Prop) -> itree E1 R1 -> itree E2 R2 -> Prop) :
+    forall R1 R2, (R1 -> R2 -> Prop) -> itree E1 R1 -> itree E2 R2 -> Prop :=
+    fun R1 R2 RR t1 t2 =>
+      ruttF RR (sim R1 R2 RR) (observe t1) (observe t2).
 
   Lemma rutt_mono : Proper (leq ==> leq) rutt_.
   Proof. monauto. Qed.
 
-  Definition rutt_mon : mon ((R1 -> R2 -> Prop) -> itree E1 R1 -> itree E2 R2 -> Prop) :=
+  Definition rutt_mon : mon (forall R1 R2, (R1 -> R2 -> Prop) -> itree E1 R1 -> itree E2 R2 -> Prop) :=
     {| body := rutt_ ; Hbody := rutt_mono |}. 
 
-  Definition rutt : (R1 -> R2 -> Prop) -> itree E1 R1 -> itree E2 R2 -> Prop := gfp rutt_mon.
+  Definition rutt {R1 R2 : Type} : (R1 -> R2 -> Prop) -> itree E1 R1 -> itree E2 R2 -> Prop :=
+    gfp rutt_mon R1 R2.
   Hint Unfold rutt : itree.
+
+  Context {R1 R2 : Type}.
+  Implicit Types RR : R1 -> R2 -> Prop.
 
   Lemma ruttF_inv_VisF_r {sim} RR t1 U2 (e2: E2 U2) (k2: U2 -> _):
     ruttF RR sim t1 (VisF e2 k2) ->
@@ -124,31 +127,31 @@ Tactic Notation "rstep" "in" ident(h) := runfold_in h; step in h; rcbn in h.
 
 #[local] Ltac refold :=
   repeat match goal with
-  | |- context[gfp (@rutt_mon ?E1 ?E2 ?R1 ?R2 ?RE ?RA)] =>
-      fold (@rutt E1 E2 R1 R2 RE RA)
+  | |- context[gfp (@rutt_mon ?E1 ?E2 ?RE ?RA) ?R1 ?R2 ?RR] =>
+      fold (@rutt E1 E2 RE RA R1 R2 RR)
   end.
 
 Ltac fold_rutt :=
   match goal with
-  | |- context[@ruttF ?E1 ?E2 ?R1 ?R2 ?REv ?RAns ?RR] =>
-      change (@ruttF E1 E2 R1 R2 REv RAns RR) with (body (@rutt_mon E1 E2 R1 R2 REv RAns RR))
+  | |- context[@ruttF ?E1 ?E2 ?REv ?RAns ?R1 ?R2 ?RR] =>
+      change (@ruttF E1 E2 REv RAns R1 R2 RR) with (body (@rutt_mon E1 E2 REv RAns) R1 R2 RR)
   end.
 Ltac fold_rutt_in h :=
   match type of h with
-  | context[@ruttF ?E1 ?E2 ?R1 ?R2 ?REv ?RAns ?RR] =>
-      change (@ruttF E1 E2 R1 R2 REv RAns RR) with (body (@rutt_mon E1 E2 R1 R2 REv RAns RR)) in h
+  | context[@ruttF ?E1 ?E2 ?REv ?RAns ?R1 ?R2 ?RR] =>
+      change (@ruttF E1 E2 REv RAns R1 R2 RR) with (body (@rutt_mon E1 E2 REv RAns) R1 R2 RR) in h
   end.
 Tactic Notation "runstep" := fold_rutt; unstep.
 Tactic Notation "runstep" "in" ident(h) := fold_rutt_in h; unstep in h.
 
 Ltac to_rmon_core :=
 match goal with
-| |- context[@ruttF ?E1 ?E2 ?R1 ?R2 ?REv ?RAns ?RR (?f ?RR) (observe ?t1) (observe ?t2)] =>
-      change (@ruttF E1 E2 R1 R2 REv RAns RR (f RR) (observe t1) (observe t2))
-      with (@rutt_mon E1 E2 R1 R2 REv RAns f RR t1 t2)
-| |- context[@ruttF ?E1 ?E2 ?R1 ?R2 ?REv ?RAns ?RR (?f ?RR) (?con1 ?a1) (?con2 ?a2)] =>
-      change (@ruttF E1 E2 R1 R2 REv RAns RR (f RR) (con1 a1) (con2 a2))
-      with (@rutt_mon E1 E2 R1 R2 REv RAns f RR (go (con1 a1)) (go (con2 a2)))
+| |- context[@ruttF ?E1 ?E2 ?REv ?RAns ?R1 ?R2 ?RR (?f ?R1 ?R2 ?RR) (observe ?t1) (observe ?t2)] =>
+      change (@ruttF E1 E2 REv RAns R1 R2 RR (f R1 R2 RR) (observe t1) (observe t2))
+      with (body (@rutt_mon E1 E2 REv RAns) f R1 R2 RR t1 t2)
+| |- context[@ruttF ?E1 ?E2 ?REv ?RAns ?R1 ?R2 ?RR (?f ?R1 ?R2 ?RR) (?con1 ?a1) (?con2 ?a2)] =>
+      change (@ruttF E1 E2 REv RAns R1 R2 RR (f R1 R2 RR) (con1 a1) (con2 a2))
+      with (body (@rutt_mon E1 E2 REv RAns) f R1 R2 RR (go (con1 a1)) (go (con2 a2)))
 end.
 
 Ltac to_rmon :=
@@ -161,12 +164,12 @@ assert (dummy : True) by constructor;
 
 Ltac to_rmon_in h :=
 match type of h with
-| context[@ruttF ?E1 ?E2 ?R1 ?R2 ?REv ?RAns ?RR (?f ?RR) (observe ?t1) (observe ?t2)] =>
-      change (@ruttF E1 E2 R1 R2 REv RAns RR (f RR) (observe t1) (observe t2))
-      with (@rutt_mon E1 E2 R1 R2 REv RAns f RR t1 t2) in h
-| context[@ruttF ?E1 ?E2 ?R1 ?R2 ?REv ?RAns ?RR (?f ?RR) (?con1 ?a1) (?con2 ?a2)] =>
-      change (@ruttF E1 E2 R1 R2 REv RAns RR (f RR) (con1 a1) (con2 a2))
-      with (@rutt_mon E1 E2 R1 R2 REv RAns f RR (go (con1 a1)) (go (con2 a2))) in h
+| context[@ruttF ?E1 ?E2 ?REv ?RAns ?R1 ?R2 ?RR (?f ?R1 ?R2 ?RR) (observe ?t1) (observe ?t2)] =>
+      change (@ruttF E1 E2 REv RAns R1 R2 RR (f R1 R2 RR) (observe t1) (observe t2))
+      with (body (@rutt_mon E1 E2 REv RAns) f R1 R2 RR t1 t2) in h
+| context[@ruttF ?E1 ?E2 ?REv ?RAns ?R1 ?R2 ?RR (?f ?R1 ?R2 ?RR) (?con1 ?a1) (?con2 ?a2)] =>
+      change (@ruttF E1 E2 REv RAns R1 R2 RR (f R1 R2 RR) (con1 a1) (con2 a2))
+      with (body (@rutt_mon E1 E2 REv RAns) f R1 R2 RR (go (con1 a1)) (go (con2 a2))) in h
 end.
 
 Tactic Notation "to_rmon" "in" ident(h) := to_rmon_in h.
@@ -185,7 +188,7 @@ Variable (RR: R1 -> R2 -> Prop).
 
 Lemma rutt_Ret r1 r2:
   RR r1 r2 ->
-  @rutt E1 E2 R1 R2 REv RAns RR (Ret r1: itree E1 R1) (Ret r2: itree E2 R2).
+  @rutt E1 E2 REv RAns R1 R2 RR (Ret r1: itree E1 R1) (Ret r2: itree E2 R2).
 Proof. intros. rstep. constructor; auto. Qed.
 
 Lemma rutt_inv_Ret r1 r2:
