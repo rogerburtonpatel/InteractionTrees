@@ -537,7 +537,7 @@ Proof.
   (* todo: this *)
   - destruct (observe b') eqn : Hb; destruct (observe b) eqn : Hb'; inversion H; subst; cbn;
       try solve [to_mon; constructor; eauto; now do 2 step]. 
-    + taus. now do 2 Utils.step.  
+    + apply Eqit.EqTau. now do 2 Utils.step.  
       + ddestruction. constructor. intros. inv H. 
       ddestruction. do 2 Utils.step. apply REL0. 
   (*looks like I didn't actually need to induct here ... *)
