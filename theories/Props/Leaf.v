@@ -225,7 +225,7 @@ Proof.
     * apply LeafRet; auto.
     * apply LeafRet; auto.
     * exact REL.
-  + apply EqTau. 
+  + taus. 
     eapply IH.
     * exact REL.
     * intros u1 u2 HL1 HL2 HU.
@@ -242,10 +242,10 @@ Proof.
       -- eapply LeafVis; eauto.
       -- exact HU.
   + rewrite observe_bind. simpobs.
-    (apply EqTauL; [auto|]).
+    taul.
     eapply IHEQT; eauto with itree.
   + setoid_rewrite observe_bind at 2. simpobs.
-    (apply EqTauR; [auto|]).
+    taur.
     eapply IHEQT; eauto with itree.
 Qed.
 
@@ -429,7 +429,7 @@ Proof.
   - constructor. apply CIH. apply SubtreeTau, Hsub.
   - to_mon. eapply eqit_bind_chain. reflexivity.
     intros u _ <-.
-    apply EqTau. apply CIH. eapply SubtreeVis, Hsub. reflexivity.
+    taus. apply CIH. eapply SubtreeVis, Hsub. reflexivity.
 Qed.
 
 Lemma Leaf_interp_state_subtree_inv {E F S R} (h: E ~> Monads.stateT S (itree F))
@@ -444,7 +444,7 @@ Proof.
   - constructor. apply CIH. apply SubtreeTau, Hsub.
   - to_mon. eapply eqit_bind_chain. reflexivity.
     intros [u1 u2] _ <-; cbn.
-    apply EqTau. apply CIH. eapply SubtreeVis, Hsub. reflexivity.
+    taus. apply CIH. eapply SubtreeVis, Hsub. reflexivity.
 Qed.
 
 End Subtree.

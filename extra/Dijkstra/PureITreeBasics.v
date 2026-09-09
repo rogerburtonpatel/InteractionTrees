@@ -97,12 +97,12 @@ Lemma eutt_ret_euttge : forall (E : Type -> Type) (A : Type) (a : A) (t : itree 
 Proof.
   intros. generalize dependent t. icoinduction c CIH. intros. sinv H.
   - reflexivity.  
-  - (apply EqTauL; [auto|]). 
+  - taul. 
   (* Unset Printing Notations.  *)
     remember (observe (Ret a)).
     induction REL; try discriminate. 
     + eret. 
-    + (apply EqTauL; [auto|]). now apply IHREL.  
+    + taul. now apply IHREL.  
 Qed.
 
 Lemma unfold_spin : forall (E : Type -> Type) (A : Type), (@spin E A) ≅ Tau spin.

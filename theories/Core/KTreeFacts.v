@@ -70,7 +70,7 @@ Proof.
   rewrite bind_map, bind_bind.
   ebind. 
   intros [a | b] _ [].
-  - rewrite bind_tau. apply EqTau.
+  - rewrite bind_tau. taus.
     eapply CIH. 
   - rewrite bind_ret_l, tau_euttge.
     
@@ -80,7 +80,7 @@ Proof.
     rewrite bind_map.
     ebind. 
     intros [b' | c''] _ []; cbn.
-    + now apply EqTau.
+    + now taus.
     + reflexivity.
 Qed.  
 
@@ -221,7 +221,7 @@ Proof.
   rewrite !bind_bind.
   ebind. 
   intros [] ? [].
-  - rewrite bind_tau, 2 bind_ret_l. now apply EqTau. 
+  - rewrite bind_tau, 2 bind_ret_l. now taus. 
   - rewrite bind_ret_l, !bind_bind. setoid_rewrite bind_ret_l. rewrite bind_ret_r.
     reflexivity.
 Qed.
@@ -254,7 +254,7 @@ Proof.
   (* Tour: show this *)
   (* old TODO: here we should be able to apply symmetry and be done. *)
   (* Win! *)
-  - rewrite bind_tau. apply EqTau. symmetry. eapply CIH. 
+  - rewrite bind_tau. taus. symmetry. eapply CIH. 
   - rewrite bind_ret_l. reflexivity. 
 Qed.
 
@@ -305,7 +305,7 @@ Proof.
   ebind. 
   intros [| []] ? [].
   - rewrite bind_ret_l, bind_tau.
-    apply EqTau. 
+    taus. 
     revert a.
     accumulate acc. 
     intros.
@@ -314,11 +314,11 @@ Proof.
     rewrite !bind_bind.
     ebind. 
     intros [| []] ? [].
-    + rewrite bind_tau, bind_ret_l. apply EqTau; apply acc. 
-    + rewrite 2 bind_ret_l. apply EqTau; apply CIH.  
+    + rewrite bind_tau, bind_ret_l. taus; apply acc. 
+    + rewrite 2 bind_ret_l. taus; apply CIH.  
     + rewrite 2 bind_ret_l. reflexivity. 
   - rewrite 2 bind_ret_l.
-    apply EqTau; apply CIH. 
+    taus; apply CIH. 
   - rewrite 2 bind_ret_l.
     reflexivity. 
 Qed.
@@ -362,7 +362,7 @@ Proof.
   - (* If we loop back to f, we can conclude by coinduction *)
     rewrite ! bind_ret_l.
     rewrite bind_tau.
-    apply EqTau. 
+    taus. 
     specialize (CIH xa).
     symmetry. 
     rewrite <- bind_ret_l. symmetry. 
@@ -385,7 +385,7 @@ Proof.
     intros [xb' | xc] ? <-.
     + (* We loop back in the second loop *)
       rewrite !bind_ret_l.
-      apply EqTau.
+      taus.
       apply CIH'.  
     + rewrite !bind_ret_l.
       reflexivity. 

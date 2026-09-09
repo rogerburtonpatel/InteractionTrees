@@ -90,6 +90,8 @@ Ltac contra_size :=
   match goal with
   | [ Hemp : empty ?A, Hne : nonempty ?A |- _ ] => inv Hemp; inv Hne; contradiction end.
 
+#[local] Ltac taul := apply pisecEqTauL; [auto|].
+#[local] Ltac taur := apply pisecEqTauR; [auto|].
 
 Lemma eqit_secure_imp_pi_eqit_scure b1 b2 E R1 R2 RR Label priv l : forall (t1 : itree E R1) (t2 : itree E R2),
     eqit_secure Label priv RR b1 b2 l t1 t2 -> pi_eqit_secure Label priv RR b1 b2 l t1 t2.
@@ -224,6 +226,8 @@ Ltac inv_eq_itree :=
   | [ H : eqitF _ false false _ _ (VisF _ _) |- _ ] => inv H; try discriminate
   end. 
 
+#[local] Ltac taul ::= eapply pisecEqTauL; [auto|].
+#[local] Ltac taur ::= eapply pisecEqTauR; [auto|].
 
 (* #[global] Instance pi_eqit_secure_proper_secureChain {E R1 R2}  Label priv (RR : R1 -> R2 -> Prop) l
   (c : Chain (pi_secure_eqit_mon Label priv RR true true l)) :
@@ -340,8 +344,8 @@ Proof.
   induction Hpi; inv_eq_itree.
   (* ret and coinductive cases are simple *)
   1,2: eauto 4 with itree. 
-  - (eapply pisecEqTauL; [auto|]). eapply CIH. apply REL. step; apply H34. assumption. 
-  - (eapply pisecEqTauR; [auto|]). eapply CIH. step; apply H12. apply REL. assumption. 
+  - taul. eapply CIH. apply REL. step; apply H34. assumption. 
+  - taur. eapply CIH. step; apply H12. apply REL. assumption. 
   - ddestruction. evis.  
   - ddestruction. unpriv_pi. eapply CIH. apply REL0. apply REL. apply H. 
   - ddestruction. unpriv_pi. eapply CIH. apply REL. apply REL0. apply H.
@@ -444,17 +448,18 @@ Proof.
   tower induction. intros CIH Hbody t1 t2 Ht12. step in Ht12. 
   icbn. genobs t1 ot1. genobs t2 ot2.
   hinduction Ht12 before E; intros. 
+  #[local] Ltac break_observe := unfold observe; cbn; simpobs; cbn. 
   (* QUESTION: why does 'now step; apply Hbody' instead of auto fail? *)
   #[local] Ltac pi_solve CIH := constructor; auto; intros; by_coinduction CIH.
-  - (unfold observe; cbn; simpobs; cbn). inv H; cbn; eauto 4 with itree.
+  - break_observe. inv H; cbn; eauto 4 with itree.
     constructor. now step; apply Hbody. 
-  - (unfold observe; cbn; simpobs; cbn). pi_solve CIH.
+  - break_observe. pi_solve CIH.
   - unfold observe at 1; cbn; simpobs. pi_solve CIH.
   - unfold observe at 2; cbn; simpobs. pi_solve CIH.
-  - (unfold observe; cbn; simpobs; cbn). pi_solve CIH.
-  - (unfold observe; cbn; simpobs; cbn). pi_solve CIH.
-  - (unfold observe; cbn; simpobs; cbn). pi_solve CIH.
-  - (unfold observe; cbn; simpobs; cbn). pi_solve CIH.
+  - break_observe. pi_solve CIH.
+  - break_observe. pi_solve CIH.
+  - break_observe. pi_solve CIH.
+  - break_observe. pi_solve CIH.
   - unfold observe at 1; cbn; simpobs. pi_solve CIH.
   - unfold observe at 2; cbn; simpobs. pi_solve CIH.
 Qed. 
@@ -474,8 +479,8 @@ Proof.
   remember (observe (body1 a1)).
   remember (observe (body2 a2)).
   hinduction Hbodya before E; intros; cbn; auto with itree.
-  - (unfold observe; cbn; simpobs; cbn). inv H; cbn; eauto 4 with itree. 
-  - (unfold observe; cbn; simpobs; cbn). constructor. 
+  - break_observe. inv H; cbn; eauto 4 with itree. 
+  - break_observe. constructor. 
     eapply pi_eqit_secure_iter_bind_aux; eauto.
     (* taul, taur hard *)
   - unfold observe at 1; cbn; simpobs. constructor; auto. ITree.fold_subst.
@@ -484,12 +489,12 @@ Proof.
   - unfold observe at 2; cbn; simpobs. constructor; auto. ITree.fold_subst.
     rewrite unfold_iter. eapply pi_eqit_secure_iter_bind_aux; eauto. 
     now simpobs_subst.   
-  - (unfold observe; cbn; simpobs; cbn). constructor; auto. intro. eapply pi_eqit_secure_iter_bind_aux; eauto. apply H. 
-  - (unfold observe; cbn; simpobs; cbn). constructor; intros; auto. eapply pi_eqit_secure_iter_bind_aux; intros. 
+  - break_observe. constructor; auto. intro. eapply pi_eqit_secure_iter_bind_aux; eauto. apply H. 
+  - break_observe. constructor; intros; auto. eapply pi_eqit_secure_iter_bind_aux; intros. 
     apply CIH; eauto. apply H. 
-  - (unfold observe; cbn; simpobs; cbn). constructor; intros; auto. eapply pi_eqit_secure_iter_bind_aux; eauto. 
+  - break_observe. constructor; intros; auto. eapply pi_eqit_secure_iter_bind_aux; eauto. 
     apply H. 
-  - (unfold observe; cbn; simpobs; cbn). constructor; intros; auto. eapply pi_eqit_secure_iter_bind_aux; eauto. 
+  - break_observe. constructor; intros; auto. eapply pi_eqit_secure_iter_bind_aux; eauto. 
     apply H. 
   - unfold observe at 1; cbn; simpobs; cbn. constructor; intros; auto. 
     rewrite unfold_iter. 
