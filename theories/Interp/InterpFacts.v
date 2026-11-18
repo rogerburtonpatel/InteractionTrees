@@ -116,7 +116,7 @@ Instance eq_itree_interp {E F}
             interp.
 Proof.
   intros f g Hfg T.
-  coinduction c CIH. intros. 
+  coinduction c CIH. intros a1 a2 H. 
   rewrite 2 unfold_interp.
   step in H. 
 
@@ -144,11 +144,11 @@ Instance eutt_interp (E F : Type -> Type)
 Proof.
   repeat red.
   intros until T.
-  coinduction. intros.
+  coinduction. intros a1 a2 H0.
   rewrite !unfold_interp. step in H0. 
   induction H0; intros; subst; cbn; eauto 4 with itree; to_mon.   
   eapply eqit_bind_chain. 
-  - do 2 step. apply H. 
+  - step; base. apply H. 
   - intros ??[=<-]. taus; eauto 4 with itree. 
   - taul. to_mon. rewrite unfold_interp. apply IHeqitF. 
   - taur. to_mon. rewrite unfold_interp. apply IHeqitF. 
@@ -163,11 +163,11 @@ Instance euttge_interp (E F : Type -> Type)
 Proof.
   repeat red.
   intros until T.
-  coinduction. intros.
+  coinduction. intros a1 a2 H0.
   rewrite !unfold_interp. step in H0. 
   induction H0; intros; subst; cbn; try discriminate; eauto 4 with itree; to_mon.
   eapply eqit_bind_chain. 
-  - do 2 step. apply H. 
+  - step; base. apply H. 
   - intros ??[=<-]. taus; eauto 4 with itree. 
   - taul. to_mon. rewrite unfold_interp. apply IHeqitF. 
 Qed.
@@ -178,7 +178,7 @@ Instance eutt_interp' {E F : Type -> Type} {R : Type} (RR: R -> R -> Prop) (f : 
          (@interp E (itree F) _ _ _ f R).
 Proof.
   repeat red.
-  coinduction. intros.
+  coinduction. intros x y H.
   rewrite !unfold_interp.
   step in H.
   induction H; cbn; try discriminate; eauto 4 with itree; to_mon. 
@@ -321,7 +321,7 @@ Proof.
   rewrite 2 unfold_iter.
   rewrite interp_bind.
   ebind. 
-  { do 2 step. apply EQ_t. }
+  { step; base. apply EQ_t. }
   intros [] _ []; cbn; to_mon. 
   - taus. apply CIH. 
   - reflexivity. 
@@ -346,7 +346,7 @@ Proof.
   rewrite 2 unfold_iter.
   rewrite interp_bind.
   ebind. 
-  do 2 step. apply Heq.
+  step; base. apply Heq.
   intros [] _ []; cbn.
   - taus. apply CIH. 
   - reflexivity. 

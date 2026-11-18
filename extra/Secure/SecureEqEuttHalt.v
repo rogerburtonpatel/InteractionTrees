@@ -772,14 +772,14 @@ Proof.
         { step. cbn. rewrite itree_eta' at 1. eapply eqit_secure_trans_aux1; eauto.
           step. constructor; auto. now unstep. }
         rewrite itree_eta'. 
-        now step. 
+        now base. 
       * destruct (classic (leq (priv _ e) l ) ).
         -- inv_e Ht23; ddestruction; subst; try contradiction.
            constructor; auto. inv_e CHECK. 
            eapply eqit_secure_trans_aux2; eauto.
         -- destruct (classic_empty X).
            ++ rewrite itree_eta'. rewrite itree_eta' at 1.
-              step. 
+              base. 
               eapply secret_halt_trans_3 with (t2 := Tau t3); eauto.
               ** now step; constructor.
               ** now step.
@@ -818,7 +818,7 @@ Proof.
            clear IHHt23. remember (k1 a) as t. specialize (H a). setoid_rewrite <- Heqt in H.
            clear Heqt a k1. inv_e CHECK. eapply eqit_secure_trans_aux2; eauto.
         -- destruct (classic_empty X).
-           ++ rewrite itree_eta'. unpriv_ind. step. 
+           ++ rewrite itree_eta'. unpriv_ind. base. 
               eapply secret_halt_trans_3; eauto. apply H.
               now step. 
            ++ unpriv_co. eapply CIH0. apply H.
@@ -854,7 +854,7 @@ Proof.
            eapply eqit_secure_trans_aux2; intros; try apply H; eauto.
            rewrite <- H5. apply H2. Unshelve. all : auto.
         -- destruct (classic_empty X).
-           ++ rewrite itree_eta'. rewrite itree_eta' at 1. step. 
+           ++ rewrite itree_eta'. rewrite itree_eta' at 1. base. 
               eapply secret_halt_trans_3 with (t2 := Vis e k2); eauto.
               ** step. cbn. unpriv_co.
               ** now step. 
@@ -926,7 +926,7 @@ Proof.
        now unstep. Unshelve. auto.
     + assert (Hne : nonempty A0). { eauto. } inv_e Hne. eauto. Unshelve.  auto.
     + unpriv_ind. eauto.
-    +  rewrite itree_eta'. step. 
+    +  rewrite itree_eta'. base. 
       inv_e SIZECHECK0.
       eapply secret_halt_trans_3 with (t2 := k0 a); eauto.
       * step. apply H0.
@@ -935,7 +935,7 @@ Proof.
     remember (TauF t0) as y.
     hinduction Ht23 before E; intros; inv_e Heqy; subst; eauto 4 with itree. 
     + clear IHHt23. rewrite itree_eta'. rewrite itree_eta' at 1.
-      step. 
+      base. 
       eapply secret_halt_trans_2; eauto. step. auto.
     + unpriv_halt. eapply CIH0; eauto. apply H.
     + rewrite itree_eta' at 1. unpriv_ind. eapply H0; eauto.
@@ -951,7 +951,7 @@ Proof.
       * unpriv_co. eapply CIH0; eauto. apply H1.
     +  unpriv_halt. eapply CIH0; eauto.
       step. cbn. unpriv_halt. contra_size.
- -  rewrite itree_eta' at 1. step.
+ -  rewrite itree_eta' at 1. base.
    eapply secret_halt_trans_2 with (t2 := Vis e2 k2); eauto.
    + step. cbn. unpriv_halt.
    + step. auto.

@@ -37,7 +37,7 @@ Definition not_wf_F_mon :=
   Lemma neg_wf_from_not_wf_from_l : forall (a : A),
       ~(wf_from a) -> not_wf_from a.
   Proof.
-      coinduction c CIH. intros. destruct (classic (exists a', r a a' /\ ~ ( wf_from a') )).
+      coinduction c CIH. intros a H. destruct (classic (exists a', r a a' /\ ~ ( wf_from a') )).
     - destruct H0 as [a' [Hr Hwf] ]. econstructor; eauto.
     - assert (forall a', ~ r a a' \/ wf_from a').
       {

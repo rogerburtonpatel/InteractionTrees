@@ -23,7 +23,7 @@ Import Monads.
 Import MonadNotation.
 Local Open Scope monad_scope.
 
-#[local] Tactic Notation "simple_step" := ITree.Basics.Utils.step. 
+#[local] Tactic Notation "simple_step" := Coinduction.tactics.step. 
 
 (* Contains the proof of peel_lemma which allows us
    to decompose a trace of bind t f into a head that refines t and a tail
@@ -216,7 +216,7 @@ Lemma proper_peel_eutt_l : forall (E : Type -> Type) (R S : Type)
                                   (b b': itrace E R) (t : itree E S),
     (b ≈ b') -> (peel b t ≈ peel b' t).
 Proof.
-  intros E R S. icoinduction c CIH. intros. unfold peel.
+  intros E R S. icoinduction c CIH. intros b b' t H. unfold peel.
   destruct (observe t).
   - destruct (observe b); destruct (observe b'); cbn;
       try (destruct e); try (destruct e0); cbn;
@@ -318,7 +318,7 @@ Lemma proper_peel_eutt_r : forall (E : Type -> Type) (R S : Type)
                                   (b: itrace E R) (t t': itree E S),
     (t ≈ t') -> (peel b t ≈ peel b t').
 Proof.
-  intros E R S. coinduction c CIH. intros.
+  intros E R S. coinduction c CIH. intros b t t' H.
   unfold peel. destruct (observe b) eqn : Heqb.
   - step in H. dependent induction H.
     + simpobs. reflexivity.
@@ -532,14 +532,14 @@ Lemma proper_peel_cont_eutt_l : forall (E : Type -> Type) (R S : Type)
     (b ≈ b') -> (peel_cont b t s ≈ peel_cont b' t s).
 Proof.
   intros E R S. unfold peel_cont. intros b b' t _.
-  revert b b' t. icoinduction c CIH. intros. step in H. 
+  revert b b' t. icoinduction c CIH. intros b b' t H. step in H. 
   destruct (observe t) eqn : Heqt.
   (* todo: this *)
   - destruct (observe b') eqn : Hb; destruct (observe b) eqn : Hb'; inversion H; subst; cbn;
-      try solve [to_mon; constructor; eauto; now do 2 step]. 
-    + taus. now do 2 Utils.step.  
+      try solve [to_mon; constructor; eauto; now base; step]. 
+    + taus. now Coinduction.tactics.step; base.  
       + ddestruction. constructor. intros. inv H. 
-      ddestruction. do 2 Utils.step. apply REL0. 
+      ddestruction. Coinduction.tactics.step; base. apply REL0. 
   (*looks like I didn't actually need to induct here ... *)
   - dependent induction H; try clear IHeqitF.
     + simpobs. cbn. etau.    
@@ -577,7 +577,7 @@ Qed.
 Lemma peel_cont_ret_inv : forall E R S (b : itrace E R) (t : itree E S) (s : S),
     t ≈ Ret s -> (peel_cont_ (observe b) (observe t) ≈ b).
 Proof.
-  intros E R S. coinduction c CIH. intros. step in H. cbn in H. dependent induction H; subst.
+  intros E R S. coinduction c CIH. intros b t s H. step in H. cbn in H. dependent induction H; subst.
   - simpobs. cbn. reflexivity. 
   - simpobs. destruct (observe b) eqn : Hb.
     + cbn. taul. simpobs. to_mon. 
@@ -595,7 +595,7 @@ Lemma proper_peel_cont_eutt_r : forall (E : Type -> Type) (R S : Type)
     (t ≈ t') -> (peel_cont b t s ≈ peel_cont b t' s).
 Proof.
   intros E R S. unfold peel_cont. intros b t t' _.
-  revert b t t'. coinduction c CIH. intros. step in H. dependent induction H.
+  revert b t t'. coinduction c CIH. intros b t t' H. step in H. dependent induction H.
   - simpobs. reflexivity. 
   - simpobs. destruct (observe b) eqn : Heqb; cbn.
     + cbn. taus. rewrite <- Heqb. eapply CIH. auto.
@@ -616,8 +616,8 @@ Proof.
   - simpobs. destruct (observe b) eqn : Heqb; red; cbn.
     + constructor; eauto. rewrite <- Heqb. eapply IHeqitF; eauto.
     + cbn. destruct (observe t') eqn : Heqt'; cbn.
-      * constructor.  Utils.step.  
-        unstep in H. eapply peel_cont_ret_inv with (b := t0) in H. step.
+      * constructor.  Coinduction.tactics.step.  
+        unstep in H. eapply peel_cont_ret_inv with (b := t0) in H. base.
         rewrite H. reflexivity. 
       * constructor. eapply CIH; eauto. setoid_rewrite <- tau_eutt at 2.
         step. auto.
@@ -630,7 +630,7 @@ Proof.
       *
       symmetry in H. unstep in H. 
       eapply peel_cont_ret_inv with (b := t0) in H. cbn in H. 
-      taus. symmetry. now do 2 Utils.step. 
+      taus. symmetry. now Coinduction.tactics.step; base. 
       * constructor. eapply CIH.  rewrite <- tau_eutt at 1. step. auto.
       * constructor. rewrite <- Heqt. eapply CIH.
         step. rewrite Heqt. auto.

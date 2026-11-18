@@ -179,7 +179,7 @@ Section MapFacts.
     unfold map_default_eq, interp_map; intros.
     revert t s1 s2 H.
     coinduction. 
-    intros.
+    intros t s1 s2 H.
     repeat rewrite unfold_interp_state. unfold _interp_state.
     destruct (observe t).
     - eret. 
@@ -187,7 +187,7 @@ Section MapFacts.
     - ebind. 
       unfold pure_state.
       destruct e.
-      + cbn. step. now eapply handle_map_eq. 
+      + cbn. base. now eapply handle_map_eq. 
       + cbn. evis. step; eret. 
       + intros. destruct u1. destruct u2. cbn.
         destruct H0 as [H1 H2]; cbn in H1, H2; subst.
@@ -201,7 +201,7 @@ Section MapFacts.
     repeat intro.
     revert x y H s1 s2 H0.
     coinduction. 
-    intros.
+    intros x y H s1 s2 H0.
     rewrite! unfold_interp_state. 
     step in H. 
     revert s1 s2 H0.
@@ -210,7 +210,7 @@ Section MapFacts.
     - etau.
     - ebind.
       + unfold case_. unfold Case_sum1, case_sum1.
-        do 2 step. destruct e.
+        step; base. destruct e.
         * apply handle_map_eq. assumption.
         * unfold pure_state. step. evis. step. eret. 
       + intros. etau. 

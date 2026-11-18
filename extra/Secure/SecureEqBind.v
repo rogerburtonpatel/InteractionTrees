@@ -240,10 +240,10 @@ Proof.
       now step; apply Hbody.
   - unpriv_ind. unfold observe at 1. cbn. eapply H0; eauto with itree.
   - unpriv_ind. unfold observe at 3. cbn. apply H0; eauto with itree.
-  - unpriv_halt. do 2 step. eapply iter_bind_shalt_aux1; eauto with itree.
-  - unpriv_halt. do 2 step. eapply iter_bind_shalt_aux2; eauto with itree.
-  - unpriv_halt. specialize (H b). do 2 step. eapply iter_bind_shalt_aux1; eauto with itree.
-  - unpriv_halt. specialize (H a). do 2 step. eapply iter_bind_shalt_aux2; eauto with itree.
+  - unpriv_halt. step; base. eapply iter_bind_shalt_aux1; eauto with itree.
+  - unpriv_halt. step; base. eapply iter_bind_shalt_aux2; eauto with itree.
+  - unpriv_halt. specialize (H b). step; base. eapply iter_bind_shalt_aux1; eauto with itree.
+  - unpriv_halt. specialize (H a). step; base. eapply iter_bind_shalt_aux2; eauto with itree.
 Qed. 
 
 Lemma secure_eqit_iter : forall E A1 A2 B1 B2 (RA : A1 -> A2 -> Prop) (RB : B1 -> B2 -> Prop)
@@ -275,12 +275,12 @@ Proof.
                   take very particular *) unfold observe at 1. cbn.
     eauto.
   - unpriv_ind. unfold observe at 3. cbn. eauto.
-  -  unpriv_halt. do 2 step. 
+  -  unpriv_halt. step; base. 
       eapply iter_bind_shalt_aux1; eauto. 
-  - unpriv_halt. do 2 step.  eapply iter_bind_shalt_aux2; eauto.
-  - unpriv_halt.  specialize (H b). do 2 step. 
+  - unpriv_halt. step; base.  eapply iter_bind_shalt_aux2; eauto.
+  - unpriv_halt.  specialize (H b). step; base. 
     eapply iter_bind_shalt_aux1; eauto. 
-  - unpriv_halt.  specialize (H a). do 2 step. eapply iter_bind_shalt_aux2; eauto.
+  - unpriv_halt.  specialize (H a). step; base. eapply iter_bind_shalt_aux2; eauto.
 Qed.
 
 Lemma secure_eqit_ret : forall (E : Type -> Type) Label priv l b1 b2 (R1 R2 : Type) (RR : R1 -> R2 -> Prop) (r1 : R1) (r2 : R2),

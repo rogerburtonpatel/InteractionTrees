@@ -136,7 +136,7 @@ Lemma diverges_secure_equiv_halt_r : forall A R1 R2 RR (e : E1 A) (k : A -> itre
     diverges_with (fun _ e => ~ leq (priv1 _ e) l) t.
 Proof.
   intros A R1 R2 RR e k t Hemp Hsec. revert t. coinduction c CIH.
-  intros. step in H. icbn. 
+  intros t H. step in H. icbn.
   cbn in *. remember (VisF e k) as ov.
   remember (observe t) as ot.
   hinduction H before S; intros; inv Heqov; ddestruction; subst; try discriminate;  try contradiction;
@@ -155,7 +155,7 @@ Lemma diverges_secure_equiv_halt_l : forall A R1 R2 RR (e : E1 A) (k : A -> itre
     diverges_with (fun _ e => ~ leq (priv1 _ e) l) t.
 Proof.
   intros A R1 R2 RR e k t Hemp Hsec. revert t. icoinduction c CIH.
-  intros. step in H.  
+  intros t H. step in H.
   cbn in *. remember (VisF e k) as ov. remember (observe t) as ot.
   hinduction H before S; intros; inv Heqov; subst; ddestruction; subst; try discriminate;  try contradiction;
     try contra_size; use_simpobs.
@@ -179,27 +179,27 @@ Lemma eqit_secure_silent_diverge : forall A B RR (t1 : itree E2 A) (t2 : itree E
     diverges_with (fun _ e => ~ leq (priv2 _ e) l) t2 ->
     eqit_secure Label priv2 RR true true l t1 t2.
 Proof.
-  intros A B RR. coinduction c CIH. intros.
+  intros A B RR. coinduction c CIH. intros t1 t2 H H0.
   step in H; step in H0.
   inversion H; inversion H0; use_simpobs; try rewrite H1; try rewrite H3. 
   - etau.  
   - destruct (classic_empty B0).
-    + constructor; auto. step. clear H1. clear CIH.
+    + constructor; auto. base. clear H1. clear CIH.
     (* TOUR annoying: need coinduction bug fix *)
     change (gfp (diverges_with_mon (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l) A) t)
     with (diverges_with (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l) t) in H2. 
-    generalize dependent t. coinduction c' CIH'. intros.
+    generalize dependent t. coinduction c' CIH'. intros t H2.
       sinv H2; use_simpobs.
       * rewrite H1. icbn; cbn. 
       unpriv_halt.  
       * rewrite H1. icbn; cbn. unpriv_halt. eapply CIH'; eauto. apply H7. 
     + cbn. unpriv_co. eapply CIH; eauto. apply H4.
   -  destruct (classic_empty B0).
-    +  clear H4. clear CIH. step. 
+    +  clear H4. clear CIH. base. 
        change (diverges_with' (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l) B
 (gfp (diverges_with_mon (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e)
 l) B)) (observe t2)) with (diverges_with' (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l) B (diverges_with (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l)) (observe t2)) in H0.
-      generalize dependent t2. coinduction c' CIH. intros.
+      generalize dependent t2. coinduction c' CIH. intros t2 H0.
       inversion H0; use_simpobs.
       * rewrite H4. icbn; cbn. unpriv_halt. eapply CIH; eauto. now step in H7. 
       * rewrite H4. icbn; cbn. unpriv_halt. eapply CIH; eauto. unfold diverges_with. unstep. apply H7.  
@@ -209,20 +209,20 @@ l) B)) (observe t2)) with (diverges_with' (fun (A : Type) (e : E2 A) => ~ leq (p
     + icbn; cbn. unpriv_halt. contra_size.
     + assert (diverges_with (fun _ e => ~ leq (priv2 _ e) l) (Vis e0 k0)) by 
        (step; constructor; auto). 
-      rewrite <- H4. rewrite <- H4 in H9. clear H4. clear H1 CIH. step.
+      rewrite <- H4. rewrite <- H4 in H9. clear H4. clear H1 CIH. base.
       change (diverges_with' (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l) B
       (gfp (diverges_with_mon (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l) B)) (observe t2))
       with 
       (diverges_with' (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l) B
       (diverges_with (fun (A : Type) (e : E2 A) => ~ leq (priv2 A e) l)) (observe t2)) in H0. 
       generalize dependent t2.
-      coinduction c0 CIH. intros. sinv H9; use_simpobs.
+      coinduction c0 CIH. intros t2 H0 H9. sinv H9; use_simpobs.
       * rewrite H1. icbn; cbn. unpriv_halt. eapply CIH; eauto. now step in H4.  
       * rewrite H1. icbn; cbn. unpriv_halt. eapply CIH; eauto. 
       specialize (H4 b). now step in H4. apply H4. 
     + assert (diverges_with (fun _ e => ~ leq (priv2 _ e) l) (Vis e k)) by 
        (step; constructor; auto). 
-      rewrite <- H1. rewrite <- H1 in H9. clear H1. clear H CIH. step. generalize dependent t1.
+      rewrite <- H1. rewrite <- H1 in H9. clear H1. clear H CIH. base. generalize dependent t1.
       coinduction c0 CIH. intros. sinv H9; use_simpobs.
       * rewrite H. icbn; cbn. unpriv_halt.
       * rewrite H. icbn; cbn. unpriv_halt. eapply CIH; eauto. apply H1.
@@ -299,7 +299,7 @@ Proof.
   - rewrite H. rewrite interp_state_vis.
     destruct (classic_empty B).
     + specialize (Hhandler _ e). destruct Hhandler; try contradiction; try contra_size.
-      specialize (DIVCHECK s). step. eapply diverges_with_bind; eauto.
+      specialize (DIVCHECK s). base. eapply diverges_with_bind; eauto.
     + specialize (Hhandler _ e). destruct Hhandler; try contradiction; try contra_size.
       specialize (FINCHECK s). induction FINCHECK.
       * rewrite bind_ret_l. cbn. etau. eapply CIH; eauto. apply H0.
@@ -362,26 +362,26 @@ Proof.
     + rewrite bind_vis. destruct H3. constructor 10; auto. intros. eapply H2; eauto.
   - rewrite Heqot1. rewrite interp_state_vis. rewrite Heqot2. rewrite interp_state_tau.
     pose proof Hhandler as Hhandler'. specialize (Hhandler' _ e). inv Hhandler'; try contradiction; try contra_size.
-    step. eapply eqit_secure_silent_diverge.
+    base. eapply eqit_secure_silent_diverge.
     + eapply diverges_with_bind; eauto.
     + step. constructor. eapply diverge_with_respectful_handler; eauto. eapply diverges_secure_equiv_halt_r; eauto.
   - rewrite Heqot1. rewrite interp_state_tau. rewrite Heqot2. rewrite interp_state_vis.
     pose proof Hhandler as Hhandler'. specialize (Hhandler' _ e). inv Hhandler'; try contradiction; try contra_size.
-    step. eapply eqit_secure_silent_diverge.
+    base. eapply eqit_secure_silent_diverge.
     + step. constructor. eapply diverge_with_respectful_handler; eauto. eapply diverges_secure_equiv_halt_l; eauto.
     + eapply diverges_with_bind; eauto.
   - rewrite Heqot1. rewrite Heqot2. rewrite 2 interp_state_vis.
     pose proof Hhandler as Hhandler'. pose proof Hhandler as Hhandler''.
     specialize (Hhandler'' _ e2). inv Hhandler''; try contradiction; try contra_size.
     { specialize (Hhandler' _ e1). inv Hhandler'; try contradiction; try contra_size.
-     step. eapply eqit_secure_silent_diverge.
+     base. eapply eqit_secure_silent_diverge.
       - eapply diverges_with_bind; eauto.
       - specialize (FINCHECK s2). induction FINCHECK.
         + rewrite bind_ret_l. step. constructor. cbn. eapply diverge_with_respectful_handler; eauto. eapply diverges_secure_equiv_halt_r; eauto. apply H.
         + rewrite bind_tau. step. constructor. eapply IHFINCHECK; eauto.
         + rewrite bind_vis. step. constructor; auto. intros. eapply H1; eauto. destruct H2; auto. }
         { specialize (Hhandler' _ e1). inv Hhandler'; try contradiction; try contra_size.
-        step. eapply eqit_secure_silent_diverge.
+        base. eapply eqit_secure_silent_diverge.
         + eapply diverges_with_bind; eauto.
         + eapply diverges_with_bind; eauto. }
   - rewrite Heqot1, Heqot2. rewrite 2 interp_state_vis. 
@@ -389,7 +389,7 @@ Proof.
     specialize (Hhandler'' _ e2). specialize (Hhandler' _ e1).   
     inv Hhandler'; try contradiction; try contra_size.
     { inv Hhandler''; try contradiction; try contra_size. 
-     step. eapply eqit_secure_silent_diverge.
+     base. eapply eqit_secure_silent_diverge.
       - specialize (FINCHECK s1). induction FINCHECK.
         + rewrite bind_ret_l. step. constructor. cbn. eapply diverge_with_respectful_handler; eauto. eapply diverges_secure_equiv_halt_l; eauto.  apply H.
         + rewrite bind_tau. step. constructor. eapply IHFINCHECK; eauto.
@@ -397,7 +397,7 @@ Proof.
       - eapply diverges_with_bind; eauto.   
         }
         { inv Hhandler''; try contradiction; try contra_size.
-        step. eapply eqit_secure_silent_diverge.
+        base. eapply eqit_secure_silent_diverge.
         + eapply diverges_with_bind; eauto.
         + eapply diverges_with_bind; eauto. }
 Qed. 

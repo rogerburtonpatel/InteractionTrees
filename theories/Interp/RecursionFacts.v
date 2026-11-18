@@ -82,14 +82,14 @@ Global Instance eq_itree_mrec {R} :
   Proper (eq_itree eq ==> eq_itree eq) (@interp_mrec _ _ ctx R).
 Proof.
   repeat red. 
-  coinduction. intros.
+  coinduction. intros x y H.
   rewrite !unfold_interp_mrec.
   step in H. inv H; eauto with itree. 
   - taus. now apply CIH. 
   - cbn. destruct e.
     + taus. apply CIH.
       ebind. intros; subst.  
-    do 2 step. apply REL. 
+    step; base. apply REL. 
     + constructor. intro. step. taus. apply CIH.
     apply REL.   
   - easy. 

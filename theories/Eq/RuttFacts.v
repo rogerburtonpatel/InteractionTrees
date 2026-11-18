@@ -397,7 +397,7 @@ Proof.
   - (* Ret *)
     rewrite !observe_bind; simpobs.
     specialize (EQK _ _ H).
-     step in EQK. now do 2 step.
+     step in EQK. now base; step.
   - (* Tau *)
     rewrite !observe_bind; simpobs.
     apply EqTau. apply CIH; auto.

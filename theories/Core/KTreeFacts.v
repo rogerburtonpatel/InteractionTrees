@@ -64,7 +64,7 @@ Proof.
   - rewrite bind_ret_l, tau_euttge.
     
   (* question: why doesn't accumulate acc work? *)
-    do 2 step. revert b. coinduction. intros. 
+    step; base. revert b. coinduction. intros. 
     rewrite !unfold_iter.
     rewrite bind_map.
     ebind. 
@@ -88,7 +88,7 @@ Proof.
   specialize (eutt_body i1 i2 RI_i).
   do 2 rewrite unfold_iter.
   eapply eqit_bind_chain. 
-  do 2 step. apply eutt_body. 
+  step; base. apply eutt_body. 
   intros ? ? []; econstructor; eauto. 
 Qed.
 
@@ -106,7 +106,7 @@ Proof.
   specialize (eutt_body i1 i2 RI_i).
   do 2 rewrite unfold_iter.
   ebind.
-  do 2 step; eauto. 
+  step; base; eauto. 
   intros ? ? []; econstructor; eauto. 
 Qed.
 
@@ -125,7 +125,7 @@ Proof.
   specialize (eutt_body i1 i2 RI_i).
   do 2 rewrite unfold_iter.
   ebind. 
-  do 2 step; eauto. 
+  step; base; eauto. 
   intros ? ? []; econstructor; eauto. now apply CIH, HSUB.
 Qed.
 
@@ -363,7 +363,7 @@ Proof.
        that we have encountered in the right of the equation to keep the second part clean. 
      *)
     rewrite tau_euttge.
-    do 2 step. 
+    step; base. 
     generalize xb.
     coinduction c'' CIH'. intros. 
     (* We unfold a new step of computation *)

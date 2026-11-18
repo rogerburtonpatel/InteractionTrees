@@ -60,12 +60,12 @@ Lemma pi_eqit_secure_silent_divergel : forall A B RR (t1 : itree E2 A) (t2 : itr
     diverges_with (fun _ e => ~ leq (priv2 _ e) l) t1 ->
     pi_eqit_secure Label priv2 RR true true l t1 t2.
 Proof.
-  intros A B RR. coinduction c CIH. intros.
+  intros A B RR. coinduction c CIH. intros t1 t2 H.
   step in H. all : try apply mono_diverges_with. 
   inversion H; use_simpobs; try rewrite H0; try rewrite H1.
   - etau. 
   - destruct (classic_empty B0).
-    + step. 
+    + base.
       apply pi_eqit_secure_sym.
       apply pi_eqit_secure_private_halt; auto.
     + icbn. evis. eapply CIH; eauto. apply H1.
@@ -110,6 +110,60 @@ Proof.
   - evis. eapply CIH; eauto. apply H0.
 Qed.
 
+(* NOTE: rocq-coinduction elpi [accumulate] bug, and its workaround here.
+
+   Setup where it shows up: rocq-coinduction master 07d2a09 (the
+   [coinduction] and [accumulate] tactics reimplemented in elpi), with
+   Rocq 9.2.0 and rocq-elpi 3.5.1.
+
+   Symptom.  The two [Vis] cases below (the ones marked TOUR: PROBLEM) used to
+   start with
+     specialize (Hhandler A e). inv Hhandler; try contradiction.
+   [Hhandler] is a section [Context] hypothesis.  Every tactic in the proof
+   succeeds, but [Qed] fails with a kernel Illegal application error.  So
+   the tactic engine accepted an ill-typed proof term.  Bisection by bullet:
+   keeping only one of these two [Vis] bullets (the others admitted) still
+   fails at [Qed], while keeping any other single bullet passes.
+
+   Cause.  When a section hypothesis has been [specialize]d, the elpi
+   [accumulate] (used in these cases after [hinduction]) rebuilds the goal
+   context with the hypothesis's ORIGINAL section type.  The proof term,
+   however, still refers to the specialized local copy.  From then on, the
+   goal context and the proof term disagree about that name.  Tactics may use
+   the general type, and the kernel rejects the result at [Qed].
+
+   Minimal reproduction: extra/Secure/AccumulateSpecializeMWE.v (it imports
+   only Coinduction lattice, tower and tactics; it is not in _CoqProject).  The
+   core of it:
+     Section mwe.
+       Variable b : mon (nat -> Prop).
+       Hypothesis HP : forall n : nat, n = n.
+       Hypothesis Hb : forall (R : Chain b) n, b (elem R) n.
+       Goal forall R : Chain b, elem R 0.
+       Proof.
+         intro R. specialize (HP 0).  (* HP : 0 = 0 *)
+         accumulate H.                (* HP : forall n, n = n   -- wrong *)
+         pose proof (HP 1) as Hback.  (* accepted *)
+         apply Hb.
+       Qed.  (* Illegal application: HP0 of type 0 = 0 cannot be applied to 1 *)
+     End mwe.
+
+   Comparison on the MWE:
+   - master 07d2a09, elpi tactics ([tactics] / [all]):  BUG, as above.
+   - master 07d2a09, [ocaml_tactics] in place of [tactics]:  OK.  HP stays
+     [0 = 0], and [pose proof (HP 1)] is rejected at once.
+   - release 1.21 (OCaml tactics), Rocq 9.1.1:  OK, same as [ocaml_tactics].
+   To trigger it you need [specialize] of a section hypothesis, then
+   [accumulate].  A local hypothesis instead of a section one does not trigger
+   it, and nothing goes wrong without [accumulate].
+
+   Workaround (used below): never [specialize] a section hypothesis in this
+   proof.  Put the instance in a fresh name instead:
+     pose proof (Hhandler A e) as Hh. inv Hh; try contradiction.
+   Then [Hhandler] stays general and [Hh] is an ordinary local.  The cases
+   that [specialize (Hhandler ...)] but never reach [accumulate] are left
+   unchanged.
+*)
 Lemma interp_pi_eqit_secure_state : forall (R1 R2 : Type) (RR : R1 -> R2 -> Prop) (t1 : itree E1 R1) (t2 : itree E1 R2),
     pi_eqit_secure Label priv1 RR true true l t1 t2 ->
     state_pi_eqit_secure true true RR (interp_state handler t1) (interp_state handler t2).
@@ -181,7 +235,7 @@ Proof.
      eapply RESCHECK0. reflexivity.
  - apply simpobs in H0. rewrite <- itree_eta in H0. 
    rewrite H. rewrite H0. rewrite interp_state_vis.
-   specialize (Hhandler A e). inv Hhandler; try contradiction.
+   pose proof (Hhandler A e) as Hh. inv Hh; try contradiction.
    red in RESCHECK. apply RESCHECK in Hs as He.
     remember (handler A e s1) as t3. clear Heqt3.
     (* TOUR: PROBLEM
@@ -235,7 +289,7 @@ Proof.
       
  - apply simpobs in H. rewrite <- itree_eta in H. 
    rewrite H0. rewrite H. rewrite interp_state_vis.
-   specialize (Hhandler A e). inv Hhandler; try contradiction.
+   pose proof (Hhandler A e) as Hh. inv Hh; try contradiction.
    red in RESCHECK. symmetry in Hs. apply RESCHECK in Hs as He.
     remember (handler A e s1) as t3. clear Heqt3.
     (* TOUR: PROBLEM

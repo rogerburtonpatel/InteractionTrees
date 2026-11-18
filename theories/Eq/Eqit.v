@@ -260,13 +260,9 @@ Ltac refold_in h :=
       try fold (@eutt E _ _) in h
   end.
 
-(* Change [eqitF] to [eqit_mon]. It is a bit complex due to constructors
-   not using [observe] at all times. *)
 
 (* RAB : it would be a nice feature to have _all_ [observe] instances
-   be canonical; i.e. not to have both (observe (Ret r)) and (RetF r).
-   
-   *)
+   be canonical; i.e. not to have both (observe (Ret r)) and (RetF r). *)
 Lemma eqit_to_mon_obs {E R1 R2} b1 b2 f (RR : R1 -> R2 -> Prop) t1 t2 :
   @eqitF E R1 R2 RR b1 b2 (f R1 R2 RR) (observe t1) (observe t2)
   = eqit_mon b1 b2 f R1 R2 RR t1 t2.
@@ -292,7 +288,14 @@ Tactic Notation "iunfold" "in" "*" := iunfold_all.
 | |- context[elem _] => idtac 
 | |- _ => 
 repeat red end)
-; ITree.Basics.Utils.step; icbn; try refold.
+; Coinduction.tactics.step; icbn; try refold.
+
+(** [base] goes back from [elem R] or [b (elem R)] to [gfp b], 
+    using [gfp <= b R] for any chain [R]. *)
+#[global] Ltac base :=
+  match goal with
+  | |- context [elem ?R] => apply (gfp_bchain R)
+  end; icbn; try refold.
 
 
 (* Tactic Notation "step" "in" ident(h) :=
@@ -400,11 +403,11 @@ Goal eutt RR u v.
     unstep. 
     Fail unstep.  
     assert (eqitF eq false false (elem eqc _ _ eq) (observe v) (observe w)).
-    step.
+    base.
     (* now in the loop *)
     step. unstep. Fail unstep. step. Fail step. now (unstep; apply EQ2). 
     assert ((elem eqc _ _ eq) v w).
-    step. step. 
+    step. base. 
     (* now in the loop *)
     step. unstep. Fail unstep. step. Fail step. now (unstep; apply EQ2). 
     to_mon in H.   
@@ -588,7 +591,7 @@ Lemma eqit_mono {E R1 R2} RR RR' (b1 b2 b1' b2': bool)
 Proof.
   intros!. 
   revert a a0 H. 
-  icoinduction c CIH; intros.  
+  icoinduction c CIH; intros a a0 H.
   step in H. induction H; eauto 4 with itree.
   econstructor. now apply LERR.  
 Qed.
@@ -933,7 +936,7 @@ Qed.
 Proof with eauto with itree. 
   split; intros; 
   revert_until RR; 
-  icoinduction c CIH; intros; 
+  icoinduction c CIH; intros x y H x0 y0 H0 H1;
   step in H0; step in H1; step in H; icbn in *.
   all:
   hinduction H1 before RR; intros.
@@ -1351,8 +1354,8 @@ Qed.
   (* Test [coinduction] tactic, notations  *)
   Goal u ≈ t -> t ≈ u.
     icoinduction r CIH.
-    intros.
-    step. 
+    intros H.
+    base. 
     rewrite H. 
     reflexivity. 
 Qed.  
@@ -1429,7 +1432,7 @@ Proof.
   inv H.
   step.
   rewrite observing_observe.
-  step. reflexivity.
+  base. reflexivity.
 Qed.
 
 
@@ -1826,7 +1829,7 @@ Lemma eutt_bind_b {U1 U2 UU} t1 t2 k1 k2
   eqit_mon true true (elem c) _ _ RR (ITree.bind t1 k1) (ITree.bind t2 k2).
 Proof.
     eapply eqit_bind_chain; intros. 
-    all: now do 2 step; [apply EQT || apply EQK].
+    all: now step; base; [apply EQT || apply EQK].
 Qed. 
 
 
@@ -1997,7 +2000,7 @@ Proof.
   icoinduction c CIH.
   intros.
   desobs s H; cbn; simpobs. 
-  1: step. reflexivity. 
+  1: base. reflexivity. 
   all: constructor; intros; eapply elem_observing_proper.
   all: try eapply CIH.
   all: constructor. 
@@ -2353,7 +2356,7 @@ Lemma Proper_elem_bind X1 X2 Y1 Y2 RX SS u v k g
   eqit RX b1 b2 u v -> (forall x1 x2, RX x1 x2 -> elem c _ _ SS (k x1) (g x2)) -> 
   elem c _ _ SS (@ITree.bind E X1 Y1 u k) (@ITree.bind E X2 Y2 v g).
 Proof.
-  intros. eapply eqit_bind_chain; eauto. now do 2 step. 
+  intros. eapply eqit_bind_chain; eauto. now step; base. 
 Qed. 
 
 
@@ -2553,7 +2556,7 @@ Note: this is somewhat fragile, and can cause performance issues. *)
   Proper ((@eq_itree E R R eq) ==> @eqitF E R R eq b1 b2 (elem c _ _ eq)) (observe). 
 Proof. 
   intros!. 
-  step. rewrite H. reflexivity. 
+  base. rewrite H. reflexivity. 
 Qed.  
   
 

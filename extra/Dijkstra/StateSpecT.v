@@ -171,7 +171,7 @@ Section LoopInvarSpecific.
     apply iter_inl_spin. (*seems to require some coinduciton*)
     generalize dependent a. generalize dependent s.
     coinduction c CIH.  
-    intros. red in H; sinv H; try apply not_wf_F_mono'. 
+    intros s a H. red in H; sinv H; try apply not_wf_F_mono'. 
     apply not_wf with (a' := a'); eauto.
     - red in Hrel. destruct a' as [s' a']. simpl. red. simpl. rewrite Hrel.
       rewrite bind_ret_l. simpl. reflexivity.

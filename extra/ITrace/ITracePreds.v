@@ -55,7 +55,7 @@ Proof.
     apply REL. 
     apply H3.
   - apply IHHeutt. inv Hforall. now step in H0.
-  - constructor. Utils.step. apply IHHeutt. auto.
+  - constructor. Coinduction.tactics.step. apply IHHeutt. auto.
 Qed.
 
 #[global] Instance trace_forall_proper_eutt {E R PE PR} : Proper (eutt eq ==> iff) (@trace_forall E R PE PR).

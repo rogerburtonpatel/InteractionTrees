@@ -125,7 +125,7 @@ Qed.
 
 Instance IterNatural_Handler : IterNatural Handler sum1.
 Proof.
-  cbv; intros.
+  cbv -[Functor_itree Monad_itree MonadIter_itree]; intros.
   pattern f.
   match goal with
   | [ |- ?G ?f ] =>
@@ -186,7 +186,7 @@ Proof.
       rewrite interp_mrec_bind.
       subst h; bcbn.
       ebind. instantiate (1:=eq). 
-      { do 2 step. rewrite interp_mrec_as_interp, interp_interp.
+      { step; base. rewrite interp_mrec_as_interp, interp_interp.
         rewrite <- interp_id_h at 1.
         eapply eutt_interp; try reflexivity.
         intros ? ?.
@@ -227,7 +227,7 @@ Theorem interleaved_mrec : forall t1 t2,
     Recursion.interp_mrec (cat f (case_ g inr_)) t1
   ≈ Recursion.interp_mrec (cat g (case_ f inr_)) t2.
 Proof with eauto with itree. 
-  coinduction; intros.
+  coinduction; intros t1 t2 H.
   induction H.
   - rewrite 2 unfold_interp_mrec; bcbn. reflexivity.  
   - rewrite (itree_eta t); destruct (observe t).

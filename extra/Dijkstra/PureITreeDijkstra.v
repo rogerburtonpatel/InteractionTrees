@@ -251,7 +251,7 @@ Qed.
                               monotonici B (_iter f a).
     Proof.
       unfold monotonici. intros. generalize dependent a.
-      coinduction c CIH; intros. step in H0.
+      coinduction c CIH; intros a H0. step in H0.
       inv H0. 
       constructor. destruct (f a) as [fa Hfa] eqn : Heq. simpl in *.
       refine (Hfa _ _ _ _ _ H1). intros t. intros. inv H0; eauto with itree. 

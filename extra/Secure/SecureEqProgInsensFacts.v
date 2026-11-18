@@ -112,8 +112,8 @@ Lemma pi_eqit_secure_trans_ret E R1 R2 R3 Label priv l b1 b2
   pi_eqit_secure Label priv (rcompose RR1 RR2) b1 b2 l t1 t3.
 Proof.
   revert t1 t3. coinduction c CIH. 
-  intros. sinv H; subst; use_simpobs.
-  - step. rewrite H1. generalize dependent t3. icoinduction c' CIH'. intros t3 Ht3.
+  intros t1 t3 H H0. sinv H; subst; use_simpobs.
+  - base. rewrite H1. generalize dependent t3. icoinduction c' CIH'. intros t3 Ht3.
   cbn. 
     sinv Ht3; use_simpobs.
     + constructor; auto. econstructor; eauto.
@@ -140,7 +140,7 @@ Proof.
   coinduction. intros r0 Hr0. setoid_rewrite unfold_iter.
   assert (pi_eqit_secure Label priv (case_rel Rinv RS) true b2 l (body r0) (Ret s))
   by auto. 
-  remember (body r0) as t. clear Heqt. step. generalize dependent t.
+  remember (body r0) as t. clear Heqt. base. generalize dependent t.
   coinduction c' CIH'. intros t Ht.
   destruct (observe t) eqn : Heq; symmetry in Heq; apply simpobs in Heq.
   - rewrite Heq.

@@ -49,7 +49,7 @@ Lemma tau_invar_resp_eutt1: forall (E : Type -> Type) (A : Type) (P : itree E A 
 (*spin is the only divergent itree with the void1 event type,*)
 Lemma div_spin_eutt : forall (A : Type) (t : itree void1 A), any_infinite t -> t ≈ spin.
 Proof.
-  intros A. coinduction. intros. cbn.
+  intros A. coinduction. intros t H. cbn.
   destruct (observe t) eqn : Heqt.
   - specialize (itree_eta t) as Heta. rewrite Heqt in Heta. rewrite Heta in H. sinv H. 
   - constructor. apply CIH. specialize (itree_eta t) as Heta. rewrite Heqt in Heta.
@@ -63,7 +63,7 @@ Lemma eutt_reta_or_div_aux : forall A (t : itree void1 A), ~(exists a, ret a ≈
 Proof.
   intro A. unfold any_infinite, any_infinite_. 
   coinduction c CIH. 
-  intros. destruct (observe t) eqn : Heqt.
+  intros t H. destruct (observe t) eqn : Heqt.
   - exfalso. specialize (itree_eta t) as Heta. rewrite Heqt in Heta. apply H.
     exists r. rewrite Heta. reflexivity.
   - repeat red; simpobs; constructor. eapply CIH; eauto. intro. apply H.
@@ -93,7 +93,7 @@ Qed.
 Lemma eutt_ret_euttge : forall (E : Type -> Type) (A : Type) (a : A) (t : itree E A),
       t ≈ Ret a -> t ≳ Ret a.
 Proof.
-  intros. generalize dependent t. icoinduction c CIH. intros. sinv H.
+  intros. generalize dependent t. icoinduction c CIH. intros t H. sinv H.
   - reflexivity.  
   - taul. 
   (* Unset Printing Notations.  *)

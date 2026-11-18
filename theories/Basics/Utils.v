@@ -58,36 +58,6 @@ Ltac crunch :=
           | [ |- _ /\ _ ] => split
           end.
 
-(* [coinduction]-like tactics  *)
-
-(* Until https://github.com/damien-pous/coinduction/pull/22 gets merge *)
-Lemma pfp_gfp {X} {L : CompleteLattice X} (b : mon X): b (gfp b) <= (gfp b).
-Proof. apply b_chain. Qed.
-
-Ltac step := match goal with
-    | |- context [gfp ?b] => apply (pfp_gfp b)
-    | |- context [elem ?R] => first [apply (b_chain R) | apply (gfp_bchain R)]
-    end. 
-
-Ltac step_in h :=
-match type of h with
-| context [gfp ?b] => apply (gfp_pfp b) in h
-end.
-
-Tactic Notation "step" "in" ident(h) := step_in h.
-
-Ltac unstep :=
-match goal with
-| |- context [gfp ?b] => apply (gfp_pfp b)
-end.
-
-Ltac unstep_in h :=
-match type of h with
-| context [gfp ?b] => apply (pfp_gfp b) in h
-end.
-
-Tactic Notation "unstep" "in" ident(h) := unstep_in h.
-
 (* Oft-used induction tactic for general IHs. *)
 Tactic Notation "hinduction" hyp(IND) "before" hyp(H)
   := move IND before H; revert_until IND; induction IND.

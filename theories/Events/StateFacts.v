@@ -145,7 +145,7 @@ Instance eutt_interp_state {E F: Type -> Type} {S : Type}
   Proper (eutt RR ==> eq ==> eutt (prod_rel eq RR)) (@interp_state E (itree F) S _ _ _ h R).
 Proof.
   repeat intro. subst. revert_until RR.
-  coinduction. intros.
+  coinduction. intros x y H y0.
 
   rewrite !unfold_interp_state. step in H. 
   induction H; intros; subst; bcbn. 
@@ -162,7 +162,7 @@ Instance eutt_interp_state_eq {E F: Type -> Type} {S : Type}
   Proper (eutt eq ==> eq ==> eutt eq) (@interp_state E (itree F) S _ _ _ h R).
 Proof.
   repeat intro. subst. revert_until R.
-  coinduction. intros. 
+  coinduction. intros x y H y0. 
 
   rewrite !unfold_interp_state. step in H. 
   induction H; intros; subst; bcbn; eauto with itree. 
@@ -190,11 +190,11 @@ Lemma eutt_interp_state_aloop {E F S I I' A A'}
           (interp_state h (ITree.iter t2 i') s2)).
 Proof.
   intro Ht.
-  coinduction. intros.
+  coinduction. intros i i' s1 s2 H H0.
   rewrite 2 unfold_iter.
   rewrite 2 interp_state_bind.
   ebind; intros; subst. 
-  - do 2 step. eapply Ht; auto.
+  - step; base. eapply Ht; auto.
   - inv H1. inv snd_rel.
     + rewrite 2 interp_state_tau. etau. 
     + rewrite 2 interp_state_ret. eret. 
@@ -283,7 +283,7 @@ Proof.
   setoid_rewrite bind_ret_l.
   rewrite interp_state_bind.
   ebind. 
-  - do 2 step. apply EQ_t.
+  - step; base. apply EQ_t.
   - intros [s' []] _ []; bcbn.
     + etau. 
     + eret. 
@@ -312,7 +312,7 @@ Proof.
   setoid_rewrite bind_ret_l.
   rewrite interp_state_bind.
   ebind. 
-  - do 2 step. apply Heq.
+  - step; base. apply Heq.
   - intros [s' []] _ []; bcbn.
     + etau. 
     + eret. 

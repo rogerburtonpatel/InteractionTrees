@@ -60,7 +60,7 @@ Proof.
   - destruct e.
     + destruct e. bcbn. 
       rewrite 2 bind_map. rewrite 2 bind_ret_r. 
-      step. apply Hk. 
+      base. apply Hk. 
     + cbn. evis. step. cbn. etau. 
   - inversion CHECK. 
   - inversion CHECK. 
@@ -77,7 +77,7 @@ Proof.
   - destruct e.
     + destruct e. bcbn.
       rewrite 2 bind_map. rewrite 2 bind_ret_r. 
-      step. apply Hk. 
+      base. apply Hk. 
     + bcbn. evis. step. cbn. etau. 
   - cbn. taul. eapply IHHt; eauto.
   - cbn. taur. eapply IHHt; eauto.

@@ -194,7 +194,7 @@ Lemma trace_refine_proper_left' : forall (E : Type -> Type) (R : Type) (b1 b2 : 
                                     (t : itree E R), (b1 ≈ b2) -> rutt (REvRef E) (RAnsRef E) eq b1 t ->
                                                      rutt (REvRef E) (RAnsRef E) eq b2 t.
 Proof.
-  intros E R. icoinduction c CIH. intros. 
+  intros E R. icoinduction c CIH. intros b1 b2 t H H0. 
   step in H0. repeat red in H0. step in H.
   genobs t ot3. clear Heqot3. 
   hinduction H before CIH; intros; subst; eauto.
@@ -240,7 +240,7 @@ Lemma trace_refine_proper_right' : forall (E : Type -> Type) (R : Type) (b : itr
                                      (t1 t2 : itree E R), t1 ≈ t2 -> rutt (REvRef E) (RAnsRef E) eq b t1 ->
                                                           rutt (REvRef E) (RAnsRef E) eq b t2.
 Proof.
-  intros E R. icoinduction c CIH. intros. step in H. 
+  intros E R. icoinduction c CIH. intros b t1 t2 H H0. step in H. 
   step in H0. repeat red in H0. 
   genobs_clear t2 ot2.
   hinduction H before CIH; intros; clear t1; subst; eauto.
@@ -499,7 +499,7 @@ Lemma trace_refine_all_infinite : forall (E : Type -> Type) (R : Type)
 Proof.
   intros E R. unfold all_infinite at -1. 
   coinduction c CIH. 
-  intros. step in H. step in H0. repeat red in H, H0; repeat red.   
+  intros t b H H0. step in H. step in H0. repeat red in H, H0; repeat red.   
   dependent induction H0.
   - rewrite <- x in H. inv H. 
   - rewrite <- x0. constructor. eapply CIH; eauto.
@@ -539,7 +539,7 @@ Lemma trace_refine_diverge_bind : forall (E : Type -> Type) (R S : Type)
     all_infinite b -> b ⊑ t -> ITree.bind b f ⊑ ITree.bind t g.
 Proof.
   intros E R S b t f g. generalize dependent b. generalize dependent t.
-  red. icoinduction c CIH. intros.
+  red. icoinduction c CIH. intros t b H H0.
   step in H0. 
   step in H. repeat red in H0, H. 
   dependent induction H0.
@@ -560,7 +560,7 @@ Qed.
 Lemma refine_set_eq_to_eutt : forall (E : Type -> Type) (R : Type) (t1 t2 : itree E R),
     (forall b, b ⊑ t1 <-> b ⊑ t2) -> t1 ≈ t2.
 Proof.
-  intros E R. icoinduction c CIH. intros.
+  intros E R. icoinduction c CIH. intros t1 t2 H.
   remember (observe t1) as ot1. remember (observe t2) as ot2.
   destruct (ot1); destruct (ot2).
   all: specialize (itree_eta t1) as Ht1; rewrite <- Heqot1 in Ht1;
@@ -674,7 +674,7 @@ Proof.
   dependent induction  Hconv; intros m Hrefb Hrefbind.
   - rewrite H in Hrefbind. rewrite bind_ret_l in Hrefbind. rewrite H in Hrefb.
     apply trace_refine_ret_inv_r in Hrefb. rewrite Hrefb in Hrefbind.
-    rewrite bind_ret_l in Hrefbind. now step. 
+    rewrite bind_ret_l in Hrefbind. now base. 
   - (*m must be a vis, the continuations must refine then continuation in the m I use in the
       inductive hypothesis *)
     destruct e; try contradiction. rewrite H in Hrefb.

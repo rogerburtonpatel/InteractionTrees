@@ -233,7 +233,7 @@ Section PrintMults.
 
     coinduction c CIH.
     (*This coinductive hypothesis looks good*)
-    intros.
+    intros next_to_write tr si H H0 H1.
     rename H1 into HX.
     (*should be able to learn that observe tr is what we need*)
 

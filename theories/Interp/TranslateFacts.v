@@ -68,7 +68,7 @@ Qed.
 Instance eq_itree_translate' :
   Proper (eq_itree eq ==> eq_itree eq) (@translate _ _ h R).
 Proof.
-  intros!. revert x y H. icoinduction c CIH. intros. 
+  intros!. revert x y H. icoinduction c CIH. intros x y H. 
   to_mon. 
   rewrite !unfold_translate.
   step in H.
@@ -160,7 +160,7 @@ Instance eq_itree_translate {E F}
             translate.
 Proof.
   intros f g Hfg T.
-  coinduction c CIH. intros. 
+  coinduction c CIH. intros a1 a2 H. 
   rewrite 2 unfold_translate.
   step in H. 
   destruct H; cbn; try discriminate; try rewrite Hfg; eauto with itree. 
@@ -174,7 +174,7 @@ Instance eutt_translate {E F}
 Proof.
   repeat red.
   intros until T.
-  coinduction c CIH. intros.
+  coinduction c CIH. intros a1 a2 H0.
   rewrite !unfold_translate. step in H0. 
   induction H0; subst; simpl; eauto with itree. 
   - rewrite H. econstructor. eauto with itree.
@@ -197,7 +197,7 @@ Lemma eutt_translate_gen :
 Proof.
   intros *.
   revert t s.
-  coinduction c CIH. intros. 
+  coinduction c CIH. intros t s H. 
   rewrite !unfold_translate. step in H. 
   induction H; intros; subst; simpl; eauto with itree. 
 Qed. 
